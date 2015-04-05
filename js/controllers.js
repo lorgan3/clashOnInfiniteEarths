@@ -13,13 +13,14 @@ var app = angular.module('l3game')
 })
 
 // A controller for handling modalboxes. 
-.controller('modalCtrl', function ($scope, ngDialog) {
+.controller('modalCtrl', function ($scope, ngDialog, $rootScope) {
     $scope.close = function() {
         ngDialog.closeAll();
     };
 
     $scope.signIn = function() {
         console.log('sign in');
+        $rootScope.user = this.user;
         this.close();
     };
 

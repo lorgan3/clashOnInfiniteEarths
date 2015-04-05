@@ -1,6 +1,8 @@
 var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.bootstrap'])
 
 .run(function($rootScope, $location, ngDialog) {
+    $rootScope.user = undefined;
+
     /**
      * Checks if the current button is active
      * @param  {string}  link The path of the button
@@ -16,6 +18,14 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
     };
 
     /**
+     * Checks if the user is signed in.
+     * @return {boolean} True if the user is signed in.
+     */
+    $rootScope.signedIn = function() {
+        return this.user !== undefined;
+    };
+
+    /**
      * Opens the sign in modal box.
      */
     $rootScope.signIn = function () {
@@ -23,6 +33,13 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
             template: 'partials/modals/signIn.html',
             controller: 'modalCtrl'
         });
+    };
+
+    /**
+     * Signs the user out.
+     */
+    $rootScope.signOut = function() {
+        this.user = undefined;
     };
 })
 
