@@ -18,11 +18,11 @@ class GameRepository extends LinkedRepository {
      */
     public function findAll() {
         // Clean the database from old data.
-        $this->db->executeQuery('DELETE FROM Games WHERE lastContact < ? OR players >= 4', array(date('Y-m-d H:i:s', time()-40)));
+        $this->db->executeQuery('DELETE FROM Games WHERE lastContact < ? OR players >= maxPlayers', array(date('Y-m-d H:i:s', time()-40)));
 
         return $this->link($this->db->fetchAll(
-            'SELECT g.id, g.key, g.players, p.name FROM Games AS g INNER JOIN Players as p ON g.owner = p.id'),
-            array('self' => '/games/:id'));
+            'SELECT g.id, g.key, g.players, g.name, g.maxPlayers, g.peerServer, g.peerPort, p.name AS owner FROM Games AS g INNER JOIN Players as p ON g.owner = p.id'),
+            array('self' => '#/play/:key'));
     }
 
     /**
@@ -31,8 +31,8 @@ class GameRepository extends LinkedRepository {
      * @param  [Object] $user  The host.
      * @return [number]        The id of this server.
      */
-    public function host($token, $user) {
-        $this->db->insert('Games', array('key' => $token, 'lastContact' => date('Y-m-d H:i:s'), 'owner' => $user['id']));
+    public function host($token, $user, $name, $maxplayers, $peerserver, $peerport) {
+        $this->db->insert('Games', array('key' => $token, 'lastContact' => date('Y-m-d H:i:s'), 'owner' => $user['id'], 'name' => $name, 'maxPlayers' => $maxplayers, 'peerServer' => $peerserver, 'peerPort' => $peerport));
         return $this->db->lastInsertId();
     }
 

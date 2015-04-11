@@ -1,0 +1,14 @@
+<div class="ngdialog-message">
+    <h3>Server list</h3>
+    <div ng-hide="servers.length">
+        <p>No one is currently hosting.</p>
+    </div>
+    <div class="list-group">
+        <a class="list-group-item" ng-href="{{ server.links[0].href }}" ng-repeat="server in servers">
+            <h4>{{ server.name }}</h4>
+            <span>{{ server.players }}/{{ server.maxPlayers }} players</span><br />
+            <span>host: {{ server.owner }}</span><br />
+            <span ng-show="server.peerServer" class="label label-danger">Custom peerserver</span>
+        </a>
+    </div>
+</div>

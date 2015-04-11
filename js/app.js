@@ -56,9 +56,37 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
         ngDialog.open({
             template: 'partials/modals/signIn.html',
             controller: 'modalCtrl',
-            data: {modelname: 'user', rememberme: true}
+            data: {modelname: 'user', model: {rememberme: true}}
         });
     };
+
+    /**
+     * Opens the host modal box.
+     */
+    $rootScope.host = function() {
+        ngDialog.open({
+            template: 'partials/modals/host.html',
+            controller: 'modalCtrl',
+            data: {code: 'host', modelname: 'server', model: {
+                servername: getCookie('servername') || 'My Server',
+                maxplayers: Number(getCookie('maxplayers')) || 4,
+                'private': Boolean(Number(getCookie('private'))) || false,
+                peerserver: getCookie('peerserver'),
+                peerport: Number(getCookie('peerserverport')) || 9000}
+            }
+        });
+    }
+
+    /**
+     * Opens the host modal box.
+     */
+    $rootScope.join = function() {
+        ngDialog.open({
+            template: 'partials/modals/join.html',
+            controller: 'modalCtrl',
+            data: {code: 'join'}
+        });
+    }
 
     /**
      * Signs the user out.

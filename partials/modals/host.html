@@ -1,0 +1,35 @@
+<div class="ngdialog-message">
+    <form role="form" name="hostForm" novalidate>
+        <div class="form-group">
+            <label for="servername">Server name:</label>
+            <input type="text" class="form-control" id="servername" name="servername" required ng-model="server.servername" />
+        </div>
+
+        <div class="form-group">
+            <label for="maxplayers">Max players:</label>
+            <input type="number" min="2" max="16" class="form-control" id="maxplayers" name="maxplayers" required ng-model="server.maxplayers" />
+        </div>
+
+        <div class="checkbox">
+            <label><input type="checkbox" name="private" ng-model="server.private">Private</label>
+        </div>
+
+        <p>Advanced settings <small>(optional)</small></p>
+        <div class="form-group">
+            <label for="peerserver">Peer server:</label>
+            <input type="peerserver" class="form-control" id="peerserver" name="peerserver" ng-model="server.peerserver" />
+        </div>
+
+        <div class="form-group">
+            <label for="peerport">Peer server port:</label>
+            <input type="number" min="0" class="form-control" id="peerport" name="peerport" ng-model="server.peerport" />
+        </div>
+
+        <button class="btn btn-primary" ng-click="host()" ng-disabled="hostForm.servername.$invalid || hostForm.maxplayers.$invalid">
+            Host
+        </button>
+        <button class="btn btn-default" ng-click="close()">
+            Cancel
+        </button>
+    </form>
+</div>

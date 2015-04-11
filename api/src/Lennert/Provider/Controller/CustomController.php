@@ -34,7 +34,7 @@ abstract class CustomController implements ControllerProviderInterface {
         foreach ($values as $key => $regex) {
             $value = isset($input[$key]) ? $input[$key] : '';
             if (preg_match($regex, $value)) {
-                $result[$key] = trim($input[$key]);
+                $result[$key] = trim($value);
             } else {
                 $response = new \Bramus\Http\RestResponse();
                 $response->setStatus(412);

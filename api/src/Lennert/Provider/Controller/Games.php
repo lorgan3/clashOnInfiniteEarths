@@ -41,11 +41,11 @@ class Games extends CustomController {
     }
 
     public function host(Application $app) {
-        $result = $this->validateInput(array('token' => '/^\\w+$/'));
+        $result = $this->validateInput(array('token' => '/^\\w+$/', 'name' => '/^.*$/', 'maxplayers' => '/^\d{1,2}$/', 'peerserver' => '/^(\S*|)$/', 'peerport' => '/^(\d{1,5}|)$/' ));
         if (!is_array($result)) {
             return $result;
         }
-        return $this->ok($app['db.games']->host($result['token'], $app['user']));
+        return $this->ok($app['db.games']->host($result['token'], $app['user'], $result['name'], $result['maxplayers'], $result['peerserver'], $result['peerport']));
     }
 
     public function keepalive(Application $app) {

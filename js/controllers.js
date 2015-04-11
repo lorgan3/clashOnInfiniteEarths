@@ -13,10 +13,22 @@ var app = angular.module('l3game')
 })
 
 // A controller for handling modalboxes.
-.controller('modalCtrl', function($scope, ngDialog, $rootScope, Players) {
+.controller('modalCtrl', function($scope, ngDialog, $rootScope, Players, Games, $location) {
     // init
     if ($scope.ngDialogData !== undefined) {
-        $scope[$scope.ngDialogData.modelname] = $scope.ngDialogData;
+        if ($scope.ngDialogData.modelname !== undefined) {
+            $scope[$scope.ngDialogData.modelname] = $scope.ngDialogData.model;
+        }
+        if ($scope.ngDialogData.code !== undefined) {
+            switch($scope.ngDialogData.code) {
+                case 'join':
+                    // Get the server list.
+                    Games.query(function(data) {
+                        $scope.servers = data;
+                    });
+                break;
+            }
+        }
     }
 
     /**
@@ -47,6 +59,29 @@ var app = angular.module('l3game')
             setCookie('token', data.token, 365);
             $rootScope.user = {id: data.id, name: data.name, joindate: data.joindate};
         });
+
+        this.close();
+    };
+
+    /**
+     * Prepare the user's browser to host a game.
+     */
+    $scope.host = function() {
+        // Set cookies
+        setCookie('servername', this.server.servername, 365);
+        setCookie('maxplayers', this.server.maxplayers, 365);
+        setCookie('private', (this.server['private'] === true ? 1 : 0), 365);
+        setCookie('peerserver', this.server.peerserver, 365);
+        setCookie('peerserverport', this.server.peerport, 365);
+        var token = (1 + Math.random()).toString(36).substr(2, 10);
+
+        if (this.server['private'] === false) {
+            Games.save({token: token, name: this.server.servername, maxplayers: this.server.maxplayers, peerserver: this.server.peerserver, peerport: this.server.peerport}, function(data) {
+                $location.path('/play/' + token);
+            });
+        } else {
+            $location.path('/play/' + token);
+        }
 
         this.close();
     };
