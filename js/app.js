@@ -18,7 +18,7 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
     $rootScope.isActive = function(link) {
         // get the first part of the path.
         var path = /(\/\w*)\/?/.exec(window.location.hash);
-        if (path == null) {
+        if (path === null) {
             return link === '/';
         }
 
@@ -35,6 +35,19 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
     $rootScope.signedIn = function() {
         return this.user !== undefined;
     };
+
+    /**
+     * Checks if the header should be displayed. It shouldn't be displayed on the game pages.
+     * @return {boolean} True if the header should be shown.
+     */
+    $rootScope.showHeader = function() {
+        var path = /(\/\w*)\/?/.exec(window.location.hash);
+        if (path !== null && path[1] === '/play') {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Opens the sign in modal box.
@@ -80,6 +93,11 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
     })
 
     $routeProvider.when('/play/:key/', {
+        templateUrl: 'partials/game.html',
+        controller: 'gameCtrl'
+    })
+
+    $routeProvider.when('/play/', {
         templateUrl: 'partials/game.html',
         controller: 'gameCtrl'
     })

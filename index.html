@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="css/ngDialog-theme-default.min.css">
 </head>
 <body data-ng-app="l3game">
-    <div class="page-header">
+    <div class="page-header" ng-show="showHeader()">
         <h1>Example page header <small>Subtext for header</small></h1>
     </div>
-    <nav class="navbar navbar-default navbar-static-top">
+    <nav class="navbar navbar-default navbar-static-top" ng-show="showHeader()">
         <div class="container-fluid">
             <ul class="nav navbar-nav">
                 <li ng-class="{active: isActive('/')}"><a href="#/">Home</a></li>
