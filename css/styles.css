@@ -1,3 +1,26 @@
 .nav, .pagination, .carousel, .panel-title a {
     cursor: pointer;
 }
+
+/* game related */
+body {
+    margin: 0;
+    overflow: hidden;
+}
+#stats { position: absolute; top:0; left: 0 }
+#stats #fps { background: transparent !important }
+#stats #fps #fpsText { color: #CCC !important }
+#stats #fps #fpsGraph { display: none }
+
+.controls {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15%;
+    height: 100%;
+}
+
+.buttons {
+    width: 100%;
+    height: 50%;
+}

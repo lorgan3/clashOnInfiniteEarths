@@ -9,7 +9,14 @@ var app = angular.module('l3game')
 .controller('wikiCtrl', function($scope) {
 })
 
-.controller('gameCtrl', function($scope) {
+.controller('gameCtrl', function($scope, $rootScope) {
+    console.log($rootScope.token);
+    console.log($rootScope['private']);
+    console.log($rootScope.maxplayers);
+    console.log($rootScope.peerserver);
+    console.log($rootScope.peerserverport);
+    console.log($rootScope.isHost);
+    startGame();
 })
 
 // A controller for handling modalboxes.
@@ -74,6 +81,14 @@ var app = angular.module('l3game')
         setCookie('peerserver', this.server.peerserver, 365);
         setCookie('peerserverport', this.server.peerport, 365);
         var token = (1 + Math.random()).toString(36).substr(2, 10);
+
+        // Add these to the rootscope
+        $rootScope.token = token;
+        $rootScope['private'] = this.server['private'];
+        $rootScope.maxplayers = this.server.maxplayers;
+        $rootScope.peerserver = this.server.peerserver;
+        $rootScope.peerserverport = this.server.peerport;
+        $rootScope.isHost = true;
 
         if (this.server['private'] === false) {
             Games.save({token: token, name: this.server.servername, maxplayers: this.server.maxplayers, peerserver: this.server.peerserver, peerport: this.server.peerport}, function(data) {

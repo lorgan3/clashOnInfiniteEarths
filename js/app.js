@@ -121,12 +121,12 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
     })
 
     $routeProvider.when('/play/:key/', {
-        templateUrl: 'partials/game.html',
+        templateUrl: 'partials/play.html',
         controller: 'gameCtrl'
     })
 
     $routeProvider.when('/play/', {
-        templateUrl: 'partials/game.html',
+        templateUrl: 'partials/play.html',
         controller: 'gameCtrl'
     })
 
