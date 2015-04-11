@@ -212,6 +212,10 @@ l3.main.Networking.prototype.receiveFullUpdate = function(data) {
  * Sends the complete gamestate to all players.
  */
 l3.main.Networking.prototype.sendQuickUpdate = function() {
+    if (this.peer === undefined) {
+        return;
+    }
+
     var data = [];
     for(var i in players) {
         data.push(players[i].serialize());
@@ -245,9 +249,12 @@ l3.main.Networking.prototype.receiveQuickUpdate = function(data) {
  * Serializes the state of all players/yourself.
  */
 l3.main.Networking.prototype.serializeState = function() {
+    if (this.peer === undefined) {
+        return;
+    }
     var data = [];
 
-    if (this.isHost) {
+    if (this.isHost === true) {
         for(var i in players) {
             data.push(players[i].serializeState());
         }
@@ -264,7 +271,7 @@ l3.main.Networking.prototype.serializeState = function() {
  * @param {number=} id   The id of the peer.
  */
 l3.main.Networking.prototype.deserializeState = function(data, id) {
-    if (!this.isHost) {
+    if (this.isHost === false) {
         for(var i in players) {
             if (i !== '1') { // TODO get from server
                 players[i].deserializeState(data[i]);

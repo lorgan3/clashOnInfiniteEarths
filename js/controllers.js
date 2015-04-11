@@ -9,26 +9,73 @@ var app = angular.module('l3game')
 .controller('wikiCtrl', function($scope) {
 })
 
-.controller('gameCtrl', function($scope, $rootScope, Games) {
-    startGame($rootScope.isHost || false, $rootScope.token, $rootScope.maxplayers, $rootScope.peerserver, $rootScope.peerserverport);
+.controller('gameCtrl', function($scope, $rootScope, Games, $routeParams, ngDialog) {
+    /**
+     * Start the game.
+     */
+    $scope.launch = function() {
+        startGame($rootScope.isHost || false, $rootScope.token, $rootScope.maxplayers || 4, $rootScope.peerserver, $rootScope.peerserverport);
 
-    if ($rootScope['private'] === false) {
-        setInterval(function() {
-            if (isVisible() === true) {
-                Games.update({token: $rootScope.token, players: 1}, function(data) {
+        // Keep the server in the list.
+        if ($rootScope['private'] === false) {
+            setInterval(function() {
+                if (isVisible() === true) {
+                    Games.update({token: $rootScope.token, players: 1}, function(data) {
+                        // Do nothing
+                    });
+                }
+            }, 35000);
+        }
+
+        // Remove the server from the list
+        $scope.$on('$locationChangeStart', function() {
+            if ($rootScope['private'] === false && isVisible() === true) {
+                Games.remove({token: $rootScope.token}, function(data) {
                     // Do nothing
                 });
             }
-        }, 35000);
-    }
 
-    // Remove the server from the list
-    if ($rootScope['private'] === false && isVisible() === true) {
-        $scope.$on('$locationChangeStart', function() {
-            Games.remove({token: $rootScope.token}, function(data) {
-                // Do nothing
-            });
+            // Force a page reload here to clear the game.
+            location.reload();
         });
+    };
+
+    //The game was opened via a link, check the peerserver settings before continuing.
+    if ($routeParams.key !== undefined && $rootScope.token === undefined) {
+        $rootScope.token = $routeParams.key;
+
+        ngDialog.open({
+            template: 'partials/modals/peerserver.html',
+            controller: 'modalCtrl',
+            data: {modelname: 'server', model: {
+                peerserver: getCookie('peerserver'),
+                peerport: Number(getCookie('peerserverport')) || 9000}
+            },
+            scope: $scope
+        });
+
+        /**
+         * Set the peerservers and go.
+         */
+        $scope.validatePeer = function() {
+            // Set cookies
+            setCookie('peerserver', this.server.peerserver, 365);
+            setCookie('peerserverport', this.server.peerport, 365);
+            $rootScope.peerserver = this.server.peerserver;
+            $rootScope.peerserverport = this.server.peerport;
+            $scope.launch();
+            this.close();
+        };
+
+        /**
+         * Just go without setting peerservers.
+         */
+        $scope.skipPeer = function() {
+            $scope.launch();
+            this.close();
+        }
+    } else {
+        $scope.launch();
     }
 })
 
@@ -113,4 +160,26 @@ var app = angular.module('l3game')
 
         this.close();
     };
+
+    /**
+     * Joins a server
+     * @param  {Object} server The server to join.
+     */
+    $scope.join = function(server) {
+        $rootScope.token = server.key;
+        $rootScope.peerserver = server.peerserver;
+        $rootScope.peerserverport = server.peerport;
+        $rootScope.isHost = false;
+
+        $location.path('/play/' + server.key);
+
+        this.close();
+    };
+
+    /*$scope.validatePeer = function() {
+        // Set cookies
+        setCookie('peerserver', this.server.peerserver, 365);
+        setCookie('peerserverport', this.server.peerport, 365);
+    };*/
+
 });

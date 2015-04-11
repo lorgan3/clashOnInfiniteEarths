@@ -23,7 +23,7 @@ class Players extends CustomController {
             ->before(array($this, 'validateApiKey'));
 
         $controllers
-            ->post('/register', array($this, 'signUp'))
+            ->post('/register/', array($this, 'signUp'))
             ->before(array($this, 'validateApiKey'));
 
         return $controllers;

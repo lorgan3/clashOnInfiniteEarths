@@ -25,7 +25,7 @@
             <input type="number" min="0" class="form-control" id="peerport" name="peerport" ng-model="server.peerport" />
         </div>
 
-        <button class="btn btn-primary" ng-click="host()" ng-disabled="hostForm.servername.$invalid || hostForm.maxplayers.$invalid">
+        <button class="btn btn-primary" ng-click="host()" ng-disabled="hostForm.servername.$invalid || hostForm.maxplayers.$invalid || hostForm.peerport.$invalid">
             Host
         </button>
         <button class="btn btn-default" ng-click="close()">

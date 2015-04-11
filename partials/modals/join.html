@@ -4,7 +4,7 @@
         <p>No one is currently hosting.</p>
     </div>
     <div class="list-group">
-        <a class="list-group-item" ng-href="{{ server.links[0].href }}" ng-repeat="server in servers">
+        <a class="list-group-item" ng-click="join(server)" ng-repeat="server in servers">
             <h4>{{ server.name }}</h4>
             <span>{{ server.players }}/{{ server.maxPlayers }} players</span><br />
             <span>host: {{ server.owner }}</span><br />
