@@ -21,6 +21,10 @@ class RestResponse extends Response  {
 		header('Cache-Control: no-cache, must-revalidate');
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 
+		header('Access-Control-Allow-Origin: *');
+		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+		header('Access-Control-Allow-Headers: Content-type, X-Api-Key, auth-token');
+
 		// Tell it's JSON
 		header('Content-type: application/json');
 

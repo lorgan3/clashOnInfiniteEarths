@@ -12,6 +12,10 @@
                 <input type="password" class="form-control" id="pwd" name="pwd" required ng-model="user.password" />
             </div>
 
+            <div class="checkbox">
+                <label><input type="checkbox" name="rememberme" ng-model="user.rememberme"> Remember me</label>
+            </div>
+
             <button class="btn btn-primary" ng-click="signIn()" ng-disabled="signinForm.username.$invalid || signinForm.pwd.$invalid">
                 Sign in
             </button>

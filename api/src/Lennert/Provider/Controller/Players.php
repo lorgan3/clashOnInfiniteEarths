@@ -15,8 +15,8 @@ class Players extends CustomController {
 
         $controllers
             ->get('/', array($this, 'authToken'))
-            ->before(array($this, 'authorise'))
-            ->before(array($this, 'validateApiKey'));
+            ->before(array($this, 'validateApiKey'))
+            ->before(array($this, 'authorise'));
 
         $controllers
             ->post('/', array($this, 'signIn'))

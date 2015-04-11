@@ -23,3 +23,10 @@ $app->error(function (\Exception $e, $code) use ($app) {
 $app->mount('/players', new Lennert\Provider\Controller\Players());
 $app->mount('/games', new Lennert\Provider\Controller\Games());
 $app->mount('/scores', new Lennert\Provider\Controller\Scores());
+
+// Default route.
+$app->get('/', function() {
+    $response = new \Bramus\Http\RestResponse();
+    $response->setContent('Hi! Usable routes are /players, /games and /scores. Don\'t forget your API key!');
+    return $response->finish();
+});

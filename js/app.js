@@ -1,7 +1,14 @@
 var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.bootstrap'])
 
-.run(function($rootScope, $location, ngDialog) {
+.run(function($rootScope, ngDialog, Players) {
     $rootScope.user = undefined;
+
+    // Log in if the user has a token cookie.
+    if (getCookie('token') !== '') {
+        Players.sendToken({}, function(data) {
+            $rootScope.user = {id: data.id, name: data.name, joindate: data.joindate};
+        });
+    }
 
     /**
      * Checks if the current button is active
@@ -10,8 +17,12 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
      */
     $rootScope.isActive = function(link) {
         // get the first part of the path.
-        var path = /(\/\w*)\/?/.exec($location.path())[1];
-        if (path === link) {
+        var path = /(\/\w*)\/?/.exec(window.location.hash);
+        if (path == null) {
+            return link === '/';
+        }
+
+        if (path[1] === link) {
             return true;
         }
         return false;
@@ -29,9 +40,10 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
      * Opens the sign in modal box.
      */
     $rootScope.signIn = function () {
-        ngDialog.open({ 
+        ngDialog.open({
             template: 'partials/modals/signIn.html',
-            controller: 'modalCtrl'
+            controller: 'modalCtrl',
+            data: {modelname: 'user', rememberme: true}
         });
     };
 
@@ -40,8 +52,12 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
      */
     $rootScope.signOut = function() {
         this.user = undefined;
+        setCookie('token', undefined, -1);
     };
 })
+
+.constant('apiKey', 'JaTQVBvA-FdfP6542-jzeTXp4R-HtSQHCHm-ckJUY9HD')
+.constant('apiPath', 'http://' + window.location.hostname + ':8080/project2/api')
 
 .config(function($routeProvider) {
     $routeProvider.when('/', {
@@ -72,3 +88,24 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
         redirectTo: '/'
     });
 });
+
+/**
+ * Global cookie functions (http://www.w3schools.com/js/js_cookies.asp)
+ */
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+};
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+};
