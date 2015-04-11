@@ -50,7 +50,7 @@ class GameRepository extends LinkedRepository {
         } else {
             return $this->db->update('Games',
                 array('lastContact' => date('Y-m-d H:i:s'), 'players' => $players),
-                array('owner' => $user['id'], 'token' => $token));
+                array('owner' => $user['id'], 'key' => $token));
         }
     }
 
@@ -60,6 +60,6 @@ class GameRepository extends LinkedRepository {
      * @param  [number] $user  The host.
      */
     public function hide($token, $user) {
-        return $this->db->delete('Games', array('owner' => $user['id'], 'token' => $token));
+        return $this->db->delete('Games', array('owner' => $user['id'], 'key' => $token));
     }
 }

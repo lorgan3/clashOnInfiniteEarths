@@ -5,7 +5,7 @@
 /* game related */
 body {
     margin: 0;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 #stats { position: absolute; top:0; left: 0 }
 #stats #fps { background: transparent !important }

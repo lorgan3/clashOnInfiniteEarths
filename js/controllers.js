@@ -9,14 +9,27 @@ var app = angular.module('l3game')
 .controller('wikiCtrl', function($scope) {
 })
 
-.controller('gameCtrl', function($scope, $rootScope) {
-    console.log($rootScope.token);
-    console.log($rootScope['private']);
-    console.log($rootScope.maxplayers);
-    console.log($rootScope.peerserver);
-    console.log($rootScope.peerserverport);
-    console.log($rootScope.isHost);
-    startGame();
+.controller('gameCtrl', function($scope, $rootScope, Games) {
+    startGame($rootScope.isHost || false, $rootScope.token, $rootScope.maxplayers, $rootScope.peerserver, $rootScope.peerserverport);
+
+    if ($rootScope['private'] === false) {
+        setInterval(function() {
+            if (isVisible() === true) {
+                Games.update({token: $rootScope.token, players: 1}, function(data) {
+                    // Do nothing
+                });
+            }
+        }, 35000);
+    }
+
+    // Remove the server from the list
+    if ($rootScope['private'] === false && isVisible() === true) {
+        $scope.$on('$locationChangeStart', function() {
+            Games.remove({token: $rootScope.token}, function(data) {
+                // Do nothing
+            });
+        });
+    }
 })
 
 // A controller for handling modalboxes.

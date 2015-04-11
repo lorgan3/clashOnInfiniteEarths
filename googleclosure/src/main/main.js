@@ -20,9 +20,14 @@ var scene, camera, animationListener, particleHandler, objectHandler, cameraHelp
     networker, downloader, collisionHelper, control, webGLRenderer, spotLight, light, clock;
 
 /**
- * Starts the game
+ * Starts the game.
+ * @param  {boolean}  isHost         Are you the host?
+ * @param  {string=}  token          The peer token.
+ * @param  {number=}  maxplayers     The maximum amount of players.
+ * @param  {string=}  peerserver     The peerserver hostname.
+ * @param  {number=}  peerserverport The peerserver port.
  */
-function startGame() {
+function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     initStats();
 
     // create a scene, that will hold all our elements such as objects, cameras and lights.
@@ -33,7 +38,7 @@ function startGame() {
     particleHandler = new l3.helpers.ParticleHandler();
     objectHandler = new l3.helpers.ObjectHandler();
     cameraHelper = new l3.helpers.CameraHelper(camera, new THREE.Vector3(0, 0, 40));
-    networker = new l3.main.Networking();
+    networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport);
     downloader = new l3.init.Downloader();
     collisionHelper = new l3.helpers.CollisionHelper(false);
 

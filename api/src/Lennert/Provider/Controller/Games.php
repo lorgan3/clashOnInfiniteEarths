@@ -60,10 +60,13 @@ class Games extends CustomController {
     }
 
     public function hide(Application $app) {
-        $result = $this->validateInput(array('token' => '/^\\w+$/'));
-        if (!is_array($result)) {
-            return $result;
+        $token = isset($_GET['token']) ? $_GET['token'] : '';
+        if (!preg_match('/^\\w+$/', $token)) {
+            $response = new \Bramus\Http\RestResponse();
+            $response->setStatus(412);
+            $response->setContent("token is a required field and should match /^\\w+$/.");
+            return $response;
         }
-        return $this->ok($app['db.games']->hide($result['token'], $app['user']) ? 'Success' : 'Failure');
+        return $this->ok($app['db.games']->hide($token, $app['user']) ? 'Success' : 'Failure');
     }
 }

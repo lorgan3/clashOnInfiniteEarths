@@ -2,19 +2,29 @@ goog.provide('l3.main.Networking');
 
 /**
  * Handler for networking.
+ *
+ * @param  {boolean}  isHost         Are you the host?
+ * @param  {string=}  token          The peer token.
+ * @param  {number=}  maxplayers     The maximum amount of players.
+ * @param  {string=}  peerserver     The peerserver hostname.
+ * @param  {number=}  peerserverport The peerserver port.
  * @constructor
  */
-l3.main.Networking = function() {
+l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverport) {
     this.connection = undefined;
-    this.isHost = false;
+    this.isHost = isHost;
     this.peer = undefined;
     this.peers = [];
-    //var options = {'debug': 0, 'host': '192.168.1.62', 'port': 8080, 'path': '/'}
-    var options = {'key': 'lsu2wx71j874lsor', 'debug': 0}
 
-    if (confirm('Are you the host?') === true) {
-        this.isHost = true;
-        this.peer = new Peer('game', options);
+    this.maxplayers = maxplayers || 4;
+    if (peerserver !== undefined && String(peerserver).trim() !== '') {
+        var options = {'debug': 0, 'host': peerserver, 'port': peerserverport, 'path': '/'}
+    } else {
+        var options = {'key': 'lsu2wx71j874lsor', 'debug': 0}
+    }
+
+    if (isHost) {
+        this.peer = new Peer(token, options);
 
         var self = this;
         this.peer.on('connection', function(other) {
@@ -32,9 +42,9 @@ l3.main.Networking = function() {
                 console.log('opened');
             });
         });
-    } else {
+    } else if (token !== undefined) {
         this.peer = new Peer(options);
-        this.connection = this.peer.connect('game');
+        this.connection = this.peer.connect(token);
         this.addListeners(this.connection);
 
         this.peer.on('error', function(error) {
@@ -274,3 +284,13 @@ l3.main.Networking.prototype.broadcast = function(data) {
         this.peers[i].send(data);
     }
 };
+
+/**
+ * Is this server visble.
+ */
+l3.main.Networking.prototype.isVisible = function() {
+    return true;
+};
+
+// Export this function so this property can be checked in Angular..
+window['isVisible'] = l3.main.Networking.prototype.isVisible;
