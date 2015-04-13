@@ -13,24 +13,27 @@ goog.require('l3.objects.StateMachine');
  * @implements {l3.objects.Entity}
  */
 l3.objects.Player = function(model, stateMachine, options) {
-	this.model = model;
-	this.stateMachine = stateMachine;
+    this.model = model;
+    model.scale.set(0.5, 0.5, 0.5);
+    this.stateMachine = stateMachine;
 
-	this.attack = false;
-	this.move = false;
-	this.scroll = 0;
-	this.rotation = 0;
+    this.attack = false;
+    this.move = false;
+    this.scroll = 0;
+    this.rotation = 0;
 
-	this.name = 'player';
-	this.color = colors[0];
+    this.name = 'player';
 
-	this.zRot = 0;
-	this.yRot = 0;
+    // Set up pivots to aid with the orbit.
+    this.pivot = new THREE.Object3D();
+    this.pivot2 = new THREE.Object3D();
+    this.pivot2.add(this.pivot);
+    this.pivot.add(this.model);
 
-	options = options || {};
-	this.maxHp = options.maxHp || 100;
-	this.hp = options.hp || this.maxHp;
-
+    options = options || {};
+    this.maxHp = options.maxHp || 100;
+    this.hp = options.hp || this.maxHp;
+    this.speed = 0;
 };
 
 /**
@@ -38,7 +41,7 @@ l3.objects.Player = function(model, stateMachine, options) {
  * @return {Object} A json object containing all values that should be synced.
  */
 l3.objects.Player.prototype.serialize = function() {
-	return {'x': this.model.position.x, 'y': this.model.position.z, 'r': this.rotation, 'h': this.hp};
+    return {'x': this.model.position.x, 'y': this.model.position.z, 'r': this.rotation, 'h': this.hp};
 };
 
 /**
@@ -46,17 +49,17 @@ l3.objects.Player.prototype.serialize = function() {
  * @param  {Object} data A json object containing all values that should be synced.
  */
 l3.objects.Player.prototype.deserialize = function(data) {
-	this.model.position.x = data['x'];
-	this.model.position.z = data['y'];
-	this.rotation = data['r'];
-	this.hp = data['h'];
+    this.model.position.x = data['x'];
+    this.model.position.z = data['y'];
+    this.rotation = data['r'];
+    this.hp = data['h'];
 };
 
 /**
  * Serializes the player input state.
  */
 l3.objects.Player.prototype.serializeState = function() {
-	return {'a': this.attack, 'm': this.move, 'r': this.rotation};
+    return {'a': this.attack, 'm': this.move, 'r': this.rotation};
 };
 
 /**
@@ -64,9 +67,9 @@ l3.objects.Player.prototype.serializeState = function() {
  * @param {Object} data The state data.
  */
 l3.objects.Player.prototype.deserializeState = function(data) {
-	this.attack = data['a'];
-	this.move = data['m'];
-	this.rotation = data['r'];
+    this.attack = data['a'];
+    this.move = data['m'];
+    this.rotation = data['r'];
 };
 
 /**
@@ -74,58 +77,37 @@ l3.objects.Player.prototype.deserializeState = function(data) {
  * @param  {number} delta The time in ms since the last update.
  */
 l3.objects.Player.prototype.update = function(delta) {
-	//this.model.position.x += 0.05;
-	//var tanx = Math.atan2(world.position.z-this.model.position.z, world.position.y-this.model.position.y);
-	//var tany =  Math.atan2(world.position.z-this.model.position.z, this.model.position.x-world.position.x);
-	//this.model.rotation.x = tanx + Math.PI/2;
-	//this.model.rotation.y = tany + Math.PI/2;
-	//this.model.rotation.z = Math.PI/2;
-	//console.log(this.model.rotation.y);
+    this.speed = Math.max(0, this.speed-0.4*delta);
+    this.pivot.rotation.y += /*this.speed*delta;*/ 0.01;
 
-	this.yRot += 0.01;
-	//this.zRot = Math.PI/4;
-	this.model.position.x = Math.cos(this.zRot) * Math.sin(this.yRot) * 25;
-	this.model.position.y = Math.sin(this.zRot) * Math.sin(this.yRot) * 25;
-	this.model.position.z = Math.cos(this.yRot) * 25;
+    if (this.move === true) {
+        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, 1).applyEuler(this.pivot.rotation), 0.01);
+    }
 
-	this.model.rotation.z = -this.zRot - Math.PI/2;
-	this.model.rotation.y = this.yRot;
-	//this.model.rotation.x = this.zRot;
-
-	//console.log(this.model.position.x + ', ' + this.model.position.y + ', ' + this.model.position.z);
-
-	//console.log(this.model.rotation.z);
-	//this.model.rotation.z = Math.PI/2;
-	//this.model.rotation.z = Math.PI/2;
-	//console.log(new THREE.Vector3(0, 0.1, 0).applyEuler(this.model.rotation));
-	//this.model.position.add(new THREE.Vector3(0, 1, 0).applyEuler(this.model.rotation));
-	/*if (this.move === true && this.model.canMove === true) {
-		var pos = new THREE.Vector3(0, 0, 4 * delta).applyEuler(this.model.rotation);
-
-		if (!collisionHelper.collide(this.model.position.x + pos.x, this.model.position.z + pos.z)) {
-			this.model.position.add(pos);
-		}
-	}*/
-
-	/*if (this.model.canTurn) {
-		this.model.rotation.z = this.rotation;
-		this.zRot = this.rotation;
-	}*/
-
-	/*if (this.attack === true) {
-		this.stateMachine.triggerState('attack');
-	}
-
-	if (this.scroll !== 0) {
-		this.stateMachine.triggerState('switch', this.scroll);
-	}*/
+    if (this.attack === true) {
+        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, 1).applyEuler(this.pivot.rotation), -0.01);
+    }
 };
+
+/**
+ * Function to rotate an object around another objects axis.
+ * @param  {Object} object  The mesh that should be rotated.
+ * @param  {Object} axis    The axis to rotate it around.
+ * @param  {number} radians The amount of rotation that should be applied.
+ */
+l3.objects.Player.prototype.rotateAroundObjectAxis = function(object, axis, radians) {
+    var rotObjectMatrix;
+    rotObjectMatrix = new THREE.Matrix4();
+    rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
+    object.matrix.multiply(rotObjectMatrix);
+    object.rotation.setFromRotationMatrix(object.matrix);
+}
 
 /**
  * Function that destroys the entity.
  */
 l3.objects.Player.prototype.destroy = function() {
-	scene.remove(this.model);
-	delete this.model;
-	delete this.stateMachine;
+    scene.remove(this.model);
+    delete this.model;
+    delete this.stateMachine;
 };

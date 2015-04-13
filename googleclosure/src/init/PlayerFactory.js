@@ -11,8 +11,7 @@ goog.require('l3.objects.Bot');
  */
 l3.init.PlayerFactory.Wizard = function(position) {
     // animatable model.
-    var model = downloader.addClone('wizard', position, new THREE.Euler(0, 0, 0, 'XYZ'), scene);
-    model.material.materials[0].depthTest = false;
+    var model = downloader.addClone('wizard', position, new THREE.Euler(0, 0, -Math.PI/2, 'XYZ'));
     l3.init.PlayerFactory.SetAnimations(model);
     model.canMove = true;
     model.canTurn = true;
@@ -20,6 +19,23 @@ l3.init.PlayerFactory.Wizard = function(position) {
     // animationstates
     var stateMachine = new l3.objects.StateMachine(model);
     var player = new l3.objects.Player(model, stateMachine, {maxHp: 200});
+
+    // Add the players 2nd pivot to the scene rather than the model itself for the orbit to work.
+    scene.add(player.pivot2);
+
+    // Show extra lines while debugging
+    if (debug === true) {
+        // Show the player's wireframe
+        var edges = new THREE.EdgesHelper(model, 0x00ff00, 20);
+        scene2.add(edges);
+
+        // Show the player's orbit
+        var circleGeometry = new THREE.CircleGeometry(25, 32);
+        circleGeometry.vertices.shift(); // Remove the center vertex
+        var circle = new THREE.Line( circleGeometry, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
+        circle.rotation.x = Math.PI/2;
+        player.pivot.add(circle);
+    }
     return player;
 };
 

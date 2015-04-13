@@ -16,7 +16,15 @@ var players = [];
 var enemies = [];
 var colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
 
-var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper,
+/**
+ * Show debug information?
+ *
+ * @const
+ * @type {boolean}
+ */
+var debug = true;
+
+var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2,
     networker, downloader, collisionHelper, control, webGLRenderer, spotLight, light, clock;
 
 /**
@@ -32,25 +40,65 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
 
     // create a scene, that will hold all our elements such as objects, cameras and lights.
     scene = new THREE.Scene();
+    scene2 = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
+    // Various objects to help with the game.
     animationListener = new l3.helpers.AnimationListener();
     particleHandler = new l3.helpers.ParticleHandler();
     objectHandler = new l3.helpers.ObjectHandler();
-    cameraHelper = new l3.helpers.CameraHelper(camera, new THREE.Vector3(0, 0, 40));
+    cameraHelper = new l3.helpers.CameraHelper(camera, new THREE.Vector3(0, 0, 60));
     networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport);
     downloader = new l3.init.Downloader();
     collisionHelper = new l3.helpers.CollisionHelper(false);
 
+    // Start the game once all materials and objects are download.
     downloader.readyCallback = function() {
-        var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 0));
-        players.push(player);
-        objectHandler.add(player);
-        myself = 0;
-        player.model.add(camera);
-
-        world = downloader.addClone('planet', new THREE.Vector3(0, 0, 0), new THREE.Euler(0, Math.PI/2, 0, 'XYZ'), scene);
+        // The world everything revolves around.
+        world = downloader.addClone('planet', new THREE.Vector3(0, 0, 0), new THREE.Euler(0, Math.PI/2, 0, 'XYZ'));
         world.material.materials[0].map = downloader.get('planetSkin');
+        scene.add(world);
+
+        // Draw the world's x, y and z axis in debug mode.
+        if (debug === true) {
+            debugaxis(800);
+        }
+
+        if (networker.isHost === true || networker.token === undefined) {
+            for(var i=0; i<6; i++) {
+                var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
+                objectHandler.add(player);
+                players.push(player);
+
+                // Randomize
+                player.pivot2.rotation.x = Math.random() * Math.PI * 2;
+                player.pivot2.rotation.y = Math.random() * Math.PI * 2;
+                player.pivot2.rotation.z = Math.random() * Math.PI * 2;
+            }
+
+            myself = 5;
+            players[myself].model.add(camera);
+        }
+    };
+
+    var debugaxis = function(axisLength) {
+        //Shorten the vertex function
+        function v(x,y,z){
+                return new THREE.Vector3(x,y,z);
+        }
+
+        //Create axis (point1, point2, colour)
+        function createAxis(p1, p2, color){
+                var line, lineGeometry = new THREE.Geometry(),
+                lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
+                lineGeometry.vertices.push(p1, p2);
+                line = new THREE.Line(lineGeometry, lineMat);
+                scene.add(line);
+        }
+
+        createAxis(v(-axisLength, 0, 0), v(axisLength, 0, 0), 0xFF0000);
+        createAxis(v(0, -axisLength, 0), v(0, axisLength, 0), 0x00FF00);
+        createAxis(v(0, 0, -axisLength), v(0, 0, axisLength), 0x0000FF);
     };
 
     control = new l3.main.Control();
@@ -60,6 +108,8 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     webGLRenderer.setClearColor(new THREE.Color(0x999999, 1.0));
     webGLRenderer.setSize(window.innerWidth, window.innerHeight);
     webGLRenderer.shadowMapEnabled = false;
+    webGLRenderer.autoClear = false;
+
     window.addEventListener('resize', function(e) {
         // notify the renderer of the size change
         webGLRenderer.setSize(window.innerWidth, window.innerHeight);
@@ -119,7 +169,12 @@ function render() {
 
     // render using requestAnimationFrame
     requestAnimationFrame(render);
+
+    webGLRenderer.clear();
     webGLRenderer.render(scene, camera);
+    webGLRenderer.clearDepth();
+    webGLRenderer.render(scene2, camera);
+
     stats.update();
 }
 
