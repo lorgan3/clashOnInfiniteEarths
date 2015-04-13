@@ -2,11 +2,29 @@
     cursor: pointer;
 }
 
-/* game related */
-body {
-    margin: 0;
-    /*overflow: hidden;*/
+/** Warning message while playing in portrait mode */
+#portraitwarning {
+    display: none;
+    text-align: center;
+    margin: 0 auto;
+    position: relative;
 }
+
+@media only screen and (orientation:portrait){
+    #portraitwarning {
+        display:block;
+    }
+}
+
+/** Menu button for mobile devices */
+#menubutton {
+    font-size: 1.5em;
+    position: absolute;
+    padding: 20px;
+    cursor: pointer;
+}
+
+/* game related */
 #stats { position: absolute; top:0; left: 0 }
 #stats #fps { background: transparent !important }
 #stats #fps #fpsText { color: #CCC !important }

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/ngDialog.min.css">
     <link rel="stylesheet" href="css/ngDialog-theme-default.min.css">
 </head>
-<body data-ng-app="l3game">
+<body data-ng-app="l3game" ng-style="!showHeader() ? {overflow: 'hidden'} : {}">
     <div class="page-header" ng-show="showHeader()">
         <h1>Example page header <small>Subtext for header</small></h1>
     </div>

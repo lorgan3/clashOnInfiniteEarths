@@ -20,7 +20,7 @@ var app = angular.module('l3game')
         if ($rootScope['private'] === false) {
             setInterval(function() {
                 if (isVisible() === true) {
-                    Games.update({token: $rootScope.token, players: 1}, function(data) {
+                    Games.update({token: $rootScope.token, players: getPlayers()}, function(data) {
                         // Do nothing
                     });
                 }
@@ -38,12 +38,29 @@ var app = angular.module('l3game')
             // Force a page reload here to clear the game.
             location.reload();
         });
+
+        // Listen for escape keypresses to open the menu modal.
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 27 && document.getElementsByClassName('ngdialog').length === 0) {
+                $scope.showMenu();
+            }
+        });
     };
+
+     /**
+     * Opens the ingame menu dialog.
+     */
+    $scope.showMenu = function() {
+        ngDialog.open({
+            template: 'partials/modals/menu.html',
+            controller: 'modalCtrl',
+            scope: $scope
+        });
+    }
 
     //The game was opened via a link, check the peerserver settings before continuing.
     if ($routeParams.key !== undefined && $rootScope.token === undefined) {
         $rootScope.token = $routeParams.key;
-
         ngDialog.open({
             template: 'partials/modals/peerserver.html',
             controller: 'modalCtrl',
