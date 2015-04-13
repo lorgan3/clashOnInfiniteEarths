@@ -259,17 +259,21 @@ var THREE = {
         "clone": function() {},
         "setFromMatrixPosition": function() {},
         "multiply": function() {},
-        "normalize": function() {}
+        "normalize": function() {},
+        "applyAxisAngle": function() {}
     },
     "Vector4": function () {},
     "Euler": {
-        "setFromVector3": function() {}
+        "setFromVector3": function() {},
+        "setFromRotationMatrix": function() {}
     },
     "Line3": function () {},
     "Box2": function () {},
     "Box3": function () {},
     "Matrix3": function () {},
-    "Matrix4": function () {},
+    "Matrix4": {
+        "makeRotationAxis": function() {}
+    },
     "Ray": function () {},
     "Sphere": function () {},
     "Frustum": function () {},
@@ -306,7 +310,9 @@ var THREE = {
         },
         "skeleton": {
             "bones": {}
-        }
+        },
+        "up": {},
+        "matrix": {}
     },
     "Object3DIdCount": {},
     "Face3": function () {},
@@ -375,7 +381,10 @@ var THREE = {
     },
     "MaterialIdCount": {},
     "LineBasicMaterial": function () {},
-    "LineDashedMaterial": function () {},
+    "LineDashedMaterial": {
+        "gapSize": {},
+        "dashSize": {}
+    },
     "MeshBasicMaterial": function () {},
     "MeshLambertMaterial": function () {},
     "MeshPhongMaterial": function () {},
@@ -2350,7 +2359,8 @@ var THREE = {
     "WebGLRenderer": {
         "setClearColor": function() {},
         "setSize": function() {},
-        "render": function(scene, camera) {}
+        "render": function(scene, camera) {},
+        "autoClear": {}
     },
     "WebGLRenderTarget": function () {},
     "WebGLRenderTargetCube": function () {},
