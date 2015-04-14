@@ -184,8 +184,8 @@ var app = angular.module('l3game')
      */
     $scope.join = function(server) {
         $rootScope.token = server.key;
-        $rootScope.peerserver = server.peerserver;
-        $rootScope.peerserverport = server.peerport;
+        $rootScope.peerserver = server.peerServer;
+        $rootScope.peerserverport = server.peerPort;
         $rootScope.isHost = false;
 
         $location.path('/play/' + server.key);
