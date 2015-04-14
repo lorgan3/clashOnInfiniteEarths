@@ -272,7 +272,8 @@ var THREE = {
     "Box3": function () {},
     "Matrix3": function () {},
     "Matrix4": {
-        "makeRotationAxis": function() {}
+        "makeRotationAxis": function() {},
+        "makeTranslation": function() {}
     },
     "Ray": function () {},
     "Sphere": function () {},
@@ -333,7 +334,8 @@ var THREE = {
         "verticesNeedUpdate": {},
         "skeleton": {},
         "position": {},
-        "rotation": {}
+        "rotation": {},
+        "applyMatrix": {}
     },
     "GeometryIdCount": {},
     "Camera": function () {},

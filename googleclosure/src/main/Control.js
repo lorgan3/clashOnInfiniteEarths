@@ -2,9 +2,11 @@ goog.provide('l3.main.Control');
 
 /**
  * An object that keeps track of user input.
+ *
+ * @param {HTMLElement} game The game element to listen for input on.
  * @constructor
  */
-l3.main.Control = function() {
+l3.main.Control = function(game) {
 	this.mouseX = 0;
 	this.mouseY = 0;
 	this.mouseWheel = 0;
@@ -12,7 +14,6 @@ l3.main.Control = function() {
 	this.listeners = [];
 
 	var self = this;
-	var game = document.getElementById('game');
 	var move = document.getElementById('move');
 	var attack = document.getElementById('attack')
 
@@ -23,8 +24,11 @@ l3.main.Control = function() {
 		self.keys[e.keyCode] = false;
 	});
 	game.addEventListener('mousemove', function(e) {
-		self.mouseX = e.pageX;
-		self.mouseY = e.pageY;
+		self.mouseX =  e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0;
+		self.mouseY = e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0;
+
+		/*self.mouseX = e.pageX;
+		self.mouseY = e.pageY;*/
 	});
 	game.addEventListener('touchmove', function(e) {
 		var touch = e.changedTouches[0];
@@ -63,6 +67,10 @@ l3.main.Control = function() {
 	});
 
 	game.addEventListener('mousedown', function(e) {
+		if (pointerLockHelper.locked === false) {
+			pointerLockHelper.lock(game);
+		}
+
 		switch(e.which) {
 			case 1: // left
 				self.keys[l3.main.Control.Mouse.LEFT] = true;
@@ -138,10 +146,12 @@ l3.main.Control.prototype.update = function() {
 		return;
 	}
 
+	players[myself].mouseX = this.mouseX;
+	this.mouseX = 0;
 	players[myself].move = this.keys[l3.main.Control.Mouse.LEFT];
-	players[myself].attack = this.keys[l3.main.Control.Mouse.RIGHT];
-	players[myself].scroll = this.mouseWheel > 0 ? 1 : this.mouseWheel < 0 ? -1: 0;
-	players[myself].rotation = Math.atan2(window.innerWidth/2 - this.mouseX, window.innerHeight/2 - this.mouseY);
+	//players[myself].attack = this.keys[l3.main.Control.Mouse.RIGHT];
+	//players[myself].scroll = this.mouseWheel > 0 ? 1 : this.mouseWheel < 0 ? -1: 0;
+	//players[myself].rotation = Math.atan2(window.innerWidth/2 - this.mouseX, window.innerHeight/2 - this.mouseY);
 
 	this.mouseWheel = 0;
 };

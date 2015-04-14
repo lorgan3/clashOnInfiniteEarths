@@ -11,10 +11,11 @@ goog.require('l3.init.Downloader');
 goog.require('l3.init.PlayerFactory');
 goog.require('l3.helpers.CollisionHelper');
 
+goog.require('l3.helpers.PointerLockHelper');
+
 var stats, myself, world;
 var players = [];
 var enemies = [];
-var colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
 
 /**
  * Show debug information?
@@ -24,8 +25,8 @@ var colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
  */
 var debug = true;
 
-var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2,
-    networker, downloader, collisionHelper, control, webGLRenderer, spotLight, light, clock;
+var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game,
+    networker, downloader, collisionHelper, pointerLockHelper, control, webGLRenderer, spotLight, light, clock;
 
 /**
  * Starts the game.
@@ -42,6 +43,7 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     scene = new THREE.Scene();
     scene2 = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    game = document.getElementById('game');
 
     // Various objects to help with the game.
     animationListener = new l3.helpers.AnimationListener();
@@ -51,6 +53,8 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport);
     downloader = new l3.init.Downloader();
     collisionHelper = new l3.helpers.CollisionHelper(false);
+    pointerLockHelper = new l3.helpers.PointerLockHelper();
+    control = new l3.main.Control(game);
 
     // Start the game once all materials and objects are download.
     downloader.readyCallback = function() {
@@ -61,47 +65,32 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
 
         // Draw the world's x, y and z axis in debug mode.
         if (debug === true) {
-            debugaxis(800);
-        }
-
-        if (networker.isHost === true || networker.token === undefined) {
-            for(var i=0; i<6; i++) {
-                var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
-                objectHandler.add(player);
-                players.push(player);
-
-                // Randomize
-                player.pivot2.rotation.x = Math.random() * Math.PI * 2;
-                player.pivot2.rotation.y = Math.random() * Math.PI * 2;
-                player.pivot2.rotation.z = Math.random() * Math.PI * 2;
-            }
-
-            myself = 5;
-            players[myself].model.add(camera);
-        }
-    };
-
-    var debugaxis = function(axisLength) {
-        //Shorten the vertex function
-        function v(x,y,z){
-                return new THREE.Vector3(x,y,z);
-        }
-
-        //Create axis (point1, point2, colour)
-        function createAxis(p1, p2, color){
+            var createAxis = function(p1, p2, color) {
                 var line, lineGeometry = new THREE.Geometry(),
-                lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
+                lineMat = new THREE.LineBasicMaterial({ color: color });
                 lineGeometry.vertices.push(p1, p2);
                 line = new THREE.Line(lineGeometry, lineMat);
                 scene.add(line);
+            }
+
+            createAxis(new THREE.Vector3(-400, 0, 0), new THREE.Vector3(400, 0, 0), 0xff0000);
+            createAxis(new THREE.Vector3(0, -400, 0), new THREE.Vector3(0, 400, 0), 0x00ff00);
+            createAxis(new THREE.Vector3(0, 0, -400), new THREE.Vector3(0, 0, 400), 0x0000ff);
         }
 
-        createAxis(v(-axisLength, 0, 0), v(axisLength, 0, 0), 0xFF0000);
-        createAxis(v(0, -axisLength, 0), v(0, axisLength, 0), 0x00FF00);
-        createAxis(v(0, 0, -axisLength), v(0, 0, axisLength), 0x0000FF);
-    };
+        if (networker.isHost === true || networker.token === undefined) {
+            var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
+            objectHandler.add(player);
 
-    control = new l3.main.Control();
+            // Randomize
+            player.pivot2.rotation.x = Math.random() * Math.PI * 2;
+            player.pivot2.rotation.y = Math.random() * Math.PI * 2;
+            player.pivot2.rotation.z = Math.random() * Math.PI * 2;
+
+            myself = 0;
+            players[myself].model.add(camera);
+        }
+    };
 
     // create a render and set the size
     webGLRenderer = new THREE.WebGLRenderer();
@@ -124,11 +113,11 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     spotLight.intensity = 1.5;
     scene.add(spotLight);
 
-    light = new THREE.AmbientLight( 0x404040 ); // soft white light
+    light = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
     scene.add(light);
 
     // add the output of the renderer to the html element
-    document.getElementById('game').appendChild(webGLRenderer.domElement);
+    game.appendChild(webGLRenderer.domElement);
 
     clock = new THREE.Clock();
     render();

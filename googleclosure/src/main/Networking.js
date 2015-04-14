@@ -15,6 +15,7 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
     this.isHost = isHost;
     this.peer = undefined;
     this.peers = [];
+    this.token = token;
 
     this.maxplayers = maxplayers || 4;
     if (peerserver !== undefined && String(peerserver).trim() !== '') {
@@ -34,10 +35,8 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
                 self.peers.push(other);
                 other.peerId = self.peers.length;
 
-                var player = l3.init.PlayerFactory.Wizard();
-                players.push(player);
+                var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
                 objectHandler.add(player);
-
                 this.sendFullUpdate(other);
                 console.log('opened');
             });
@@ -91,6 +90,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
             connection.close();
 
             var player = players[index+1];
+            objectHandler.remove(player);
             player.destroy();
 
             self.broadcast({'a': l3.main.Networking.States.PLAYER_LEAVE, 'i': index+1});
@@ -123,25 +123,20 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 break;
                 case l3.main.Networking.States.FULL:
                     this.receiveFullUpdate(data);
-
                     myself = data['i'];
-                    cameraHelper.setUp();
+                    players[myself].model.add(camera);
                 break;
                 case l3.main.Networking.States.PLAYER_JOIN:
-                    var player = l3.init.PlayerFactory.Wizard();
+                    var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
                     player.name = data['n'];
-                    player.color = colors[data['c']];
 
-                    players.push(player);
                     objectHandler.add(player);
                 break;
                 case l3.main.Networking.States.PLAYER_LEAVE:
                     var player = players[data['i']];
+                    var myPlayer = players[myself];
                     objectHandler.remove(player);
                     player.destroy();
-
-                    var myPlayer = players[myself];
-                    players.slice(data['i'], 1);
                     myself = players.indexOf(myPlayer);
                 break;
                 case l3.main.Networking.States.OBJECT_DEATH:
@@ -160,7 +155,7 @@ l3.main.Networking.prototype.removeEnemy = function(index) {
     var object = enemies[index];
     objectHandler.remove(object);
 
-    enemies.slice(index, 1);
+    enemies.splice(index, 1);
 
     object.model.animations[1].play();
     animationListener.onEnd(object.model.animations[1], function(e) {
@@ -190,8 +185,7 @@ l3.main.Networking.prototype.sendFullUpdate = function(peer) {
  */
 l3.main.Networking.prototype.receiveFullUpdate = function(data) {
     for(var i=0; i<data['p']; i++) {
-        var player = l3.init.PlayerFactory.Wizard();
-        players.push(player);
+        var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
         objectHandler.add(player);
     }
 
@@ -234,9 +228,9 @@ l3.main.Networking.prototype.sendQuickUpdate = function() {
 l3.main.Networking.prototype.receiveQuickUpdate = function(data) {
     var j = 0;
     for(var i in players) {
-        if (j !== myself) {
+        //if (i !== myself) {
             players[i].deserialize(data[j]);
-        }
+        //}
         j++;
     }
     for(var i in enemies) {
@@ -273,9 +267,9 @@ l3.main.Networking.prototype.serializeState = function() {
 l3.main.Networking.prototype.deserializeState = function(data, id) {
     if (this.isHost === false) {
         for(var i in players) {
-            if (i !== '1') { // TODO get from server
+            //if (+i !== myself) {
                 players[i].deserializeState(data[i]);
-            }
+            //}
         }
     } else {
         players[id].deserializeState(data);
@@ -299,5 +293,16 @@ l3.main.Networking.prototype.isVisible = function() {
     return true;
 };
 
-// Export this function so this property can be checked in Angular..
+// Export this function so this property can be checked in Angular.
 window['isVisible'] = l3.main.Networking.prototype.isVisible;
+
+/**
+ * Get the amount of players in the server.
+ * @return {number} The amount of players in the server.
+ */
+l3.main.Networking.prototype.getPlayers = function() {
+    return players.length;
+};
+
+// Export this function so this property can be checked in Angular.
+window['getPlayers'] = l3.main.Networking.prototype.getPlayers;
