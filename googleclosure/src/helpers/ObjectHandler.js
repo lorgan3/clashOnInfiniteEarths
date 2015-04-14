@@ -52,9 +52,20 @@ l3.helpers.ObjectHandler.prototype.removeAt = function(index) {
  */
 l3.helpers.ObjectHandler.prototype.update = function(delta) {
     for(var i in this.objects) {
-        if (this.objects[i].update(delta) === false) {
-            this.objects[i].destroy();
-            this.removeAt(+i);
+        this.objects[i].update(delta);
+
+        // Detect if this object is colliding with another object in the 3d space.
+        var v1 = new THREE.Vector3().setFromMatrixPosition( players[i].model.matrixWorld );
+        for(var j in players) {
+            if (i === j) {
+                continue;
+            }
+            var v2 = new THREE.Vector3().setFromMatrixPosition( players[j].model.matrixWorld );
+
+            if (v1.distanceTo(v2) < 2) {
+                console.log('hit!');
+                break;
+            }
         }
     }
 };
