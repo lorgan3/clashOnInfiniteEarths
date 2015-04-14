@@ -22,8 +22,9 @@ l3.init.Downloader = function() {
 l3.init.Downloader.prototype.init = function() {
 	this.loadImage('particle', 'img/particle.png');
 	this.loadImage('planetSkin', 'img/planet.png');
+	this.loadImage('hero1Skin', 'img/hero1.png');
 
-	this.loadMesh('wizard', 'models/wizard.json');
+	this.loadMesh('wizard', 'models/hero1.json');
 	this.loadMesh('planet', 'models/planet.json');
 };
 

@@ -12,9 +12,13 @@ goog.require('l3.objects.Bot');
 l3.init.PlayerFactory.Wizard = function(position) {
     // animatable model.
     var model = downloader.addClone('wizard', position, new THREE.Euler(0, 0, -Math.PI/2, 'XYZ'));
+    model.material.materials[0].map = downloader.get('hero1Skin');
     l3.init.PlayerFactory.SetAnimations(model);
     model.canMove = true;
     model.canTurn = true;
+
+    model.animations[0].loop = true;
+    model.animations[0].play();
 
     // animationstates
     var stateMachine = new l3.objects.StateMachine(model);
