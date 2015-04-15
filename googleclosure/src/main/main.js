@@ -10,6 +10,7 @@ goog.require('l3.main.Networking');
 goog.require('l3.init.Downloader');
 goog.require('l3.init.PlayerFactory');
 goog.require('l3.helpers.CollisionHelper');
+goog.require('l3.helpers.PanelHelper');
 
 goog.require('l3.helpers.PointerLockHelper');
 
@@ -25,7 +26,7 @@ var enemies = [];
  */
 var debug = true;
 
-var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game,
+var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panelHelper,
     networker, downloader, collisionHelper, pointerLockHelper, control, webGLRenderer, spotLight, light, clock;
 
 /**
@@ -37,19 +38,21 @@ var scene, camera, animationListener, particleHandler, objectHandler, cameraHelp
  * @param  {number=}  peerserverport The peerserver port.
  */
 function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
+    game = document.getElementById('game');
     initStats();
 
     // create a scene, that will hold all our elements such as objects, cameras and lights.
     scene = new THREE.Scene();
     scene2 = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    game = document.getElementById('game');
+    camera.rotation.x = -1.35;
+    console.log(camera);
 
     // Various objects to help with the game.
+    panelHelper = new l3.helpers.PanelHelper(document.getElementById('container'));
     animationListener = new l3.helpers.AnimationListener();
-    particleHandler = new l3.helpers.ParticleHandler();
     objectHandler = new l3.helpers.ObjectHandler();
-    cameraHelper = new l3.helpers.CameraHelper(camera, new THREE.Vector3(0, 0, 60));
+    cameraHelper = new l3.helpers.CameraHelper(camera, new THREE.Vector3(0, 40, 5));
     networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport);
     downloader = new l3.init.Downloader();
     collisionHelper = new l3.helpers.CollisionHelper(false);
@@ -108,7 +111,7 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     });
 
     // add spotlight for the shadows
-    spotLight = new THREE.SpotLight(0xffffff);
+    spotLight = new THREE.SpotLight(0xdddddd);
     spotLight.position.set(100, 100, 0);
     spotLight.intensity = 1.5;
     scene.add(spotLight);
@@ -130,27 +133,37 @@ var totalDelta = 0;
 var totalDelta2 = 0;
 function render() {
     var delta = clock.getDelta();
+
+    // Update the progressbar
+    if (networker.connected === false) {
+        panelHelper.updateProgress(panelHelper.progress + delta*20);
+    }
+
     if (downloader.ready) {
         THREE.AnimationHandler.update(delta);
         objectHandler.update(delta);
 
         control.update();
         cameraHelper.update();
-        particleHandler.update();
+        if (particleHandler !== undefined) {
+            particleHandler.update();
+        }
         animationListener.update();
 
         totalDelta += delta;
-        if (totalDelta >= 0.05) {
+        if (totalDelta >= 0.05 && myself !== undefined) {
             totalDelta = 0;
+            players[myself].rotation = control.mouseX;
+            control.mouseX = 0;
             networker.serializeState();
         }
 
         totalDelta2 += delta;
         if (totalDelta2 >= 1 && networker.isHost === true) {
             totalDelta2 = 0;
-            for(var i in enemies) {
+            /*for(var i in enemies) {
                 enemies[i].aiUpdate();
-            }
+            }*/
             networker.sendQuickUpdate();
         }
     }
@@ -161,8 +174,8 @@ function render() {
 
     webGLRenderer.clear();
     webGLRenderer.render(scene, camera);
-    webGLRenderer.clearDepth();
-    webGLRenderer.render(scene2, camera);
+    //webGLRenderer.clearDepth();
+    //webGLRenderer.render(scene2, camera);
 
     stats.update();
 }

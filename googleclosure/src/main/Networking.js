@@ -16,6 +16,7 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
     this.peer = undefined;
     this.peers = [];
     this.token = token;
+    this.connected = false;
 
     this.maxplayers = maxplayers || 4;
     if (peerserver !== undefined && String(peerserver).trim() !== '') {
@@ -24,10 +25,10 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
         var options = {'key': 'lsu2wx71j874lsor', 'debug': 0}
     }
 
-    if (isHost) {
+    if (isHost === true) {
+        var self = this;
         this.peer = new Peer(token, options);
 
-        var self = this;
         this.peer.on('connection', function(other) {
             other.on('open', function() {
                 self.broadcast({'a': l3.main.Networking.States.PLAYER_JOIN, 'n': 'playerX', 'c': 1});
@@ -42,6 +43,7 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
             });
         });
     } else if (token !== undefined) {
+        panelHelper.set(l3.helpers.PanelHelper.types.INFO, 'Connection to server', 'Connecting to the server...', 0);
         this.peer = new Peer(options);
         this.connection = this.peer.connect(token);
         this.addListeners(this.connection);
@@ -49,13 +51,13 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
         this.peer.on('error', function(error) {
             switch(error.type) {
                 case 'browser-incompatible':
-                    alert('Please use a newer browser (not internet explorer)');
-                    break;
+                    panelHelper.set(l3.helpers.PanelHelper.types.DANGER, 'Incompatible browser!', 'Please use a newer browser (not internet explorer).', undefined, true);
+                break;
                 case 'peer-unavailable':
-                    alert('No one is hosting!');
-                    break;
+                     panelHelper.set(l3.helpers.PanelHelper.types.DANGER, 'Peer unavailable!', 'Can\'t connect to the selected server.', undefined, true);
+                break;
                 default:
-                    alert(error.message);
+                    panelHelper.set(l3.helpers.PanelHelper.types.DANGER, error.type, error.message, undefined, true);
                 break;
             }
         });
@@ -86,7 +88,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
         if (self.isHost === true) {
             console.log('closed');
             var index = self.peers.indexOf(connection);
-            self.peers.slice(index, 1);
+            self.peers.splice(index, 1);
             connection.close();
 
             var player = players[index+1];
@@ -99,6 +101,8 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 self.peers[i].peerId = j;
                 j++;
             }
+        } else {
+            panelHelper.set(l3.helpers.PanelHelper.types.DANGER, 'Disconnected!', 'Lost connection to the server.', undefined, true);
         }
     });
 
@@ -107,6 +111,11 @@ l3.main.Networking.prototype.addListeners = function(connection) {
     });
 
     connection.on('data', function(data) {
+        if (self.connected === false) {
+            self.connected = true;
+            panelHelper.hide();
+        }
+
         if (self.isHost === true) {
             switch(data['a']) {
                 case l3.main.Networking.States.STATE:
@@ -267,9 +276,9 @@ l3.main.Networking.prototype.serializeState = function() {
 l3.main.Networking.prototype.deserializeState = function(data, id) {
     if (this.isHost === false) {
         for(var i in players) {
-            //if (+i !== myself) {
+            if (+i !== myself) {
                 players[i].deserializeState(data[i]);
-            //}
+            }
         }
     } else {
         players[id].deserializeState(data);

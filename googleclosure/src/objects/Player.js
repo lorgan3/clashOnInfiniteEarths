@@ -14,12 +14,11 @@ goog.require('l3.objects.StateMachine');
  */
 l3.objects.Player = function(model, stateMachine, options) {
     this.model = model;
-    model.scale.set(0.51, 0.51, 0.51);
+    model.scale.set(0.3, 0.3, 0.3);
     this.stateMachine = stateMachine;
 
-    //this.attack = false;
     this.move = false;
-    this.mouseX = 0;
+    this.rotation = 0;
 
     this.name = 'player';
 
@@ -40,11 +39,7 @@ l3.objects.Player = function(model, stateMachine, options) {
  * @return {Object} A json object containing all values that should be synced.
  */
 l3.objects.Player.prototype.serialize = function() {
-    return { /*'x': this.pivot2.rotation.x / Math.PI * 16000,
-             'y': this.pivot2.rotation.y / Math.PI * 16000,
-             'z': this.pivot2.rotation.z / Math.PI * 16000,
-             'a': this.pivot.rotation.x / Math.PI * 16000,
-             'b': this.pivot.rotation.z / Math.PI * 16000,*/
+    return { 'r': Math.floor(this.pivot.rotation.y / Math.PI * 1600),
              'd': new Float32Array(this.pivot2.matrix.elements),
              's': this.speed,
              'h': this.hp
@@ -56,12 +51,7 @@ l3.objects.Player.prototype.serialize = function() {
  * @param  {Object} data A json object containing all values that should be synced.
  */
 l3.objects.Player.prototype.deserialize = function(data) {
-    //console.log(new Uint32Array(data['d']));
-    /*this.pivot2.rotation.x = Math.floor(data['x'] * Math.PI / 16000);
-    this.pivot2.rotation.y = Math.floor(data['z'] * Math.PI / 16000);
-    this.pivot2.rotation.z = Math.floor(data['y'] * Math.PI / 16000);
-    this.pivot.rotation.x = Math.floor(data['a'] * Math.PI / 16000);
-    this.pivot.rotation.z = Math.floor(data['b'] * Math.PI / 16000);*/
+    this.pivot.rotation.y = data['r'] * Math.PI / 1600;
     this.pivot2.matrix.elements = new Float32Array(data['d']);
     this.pivot2.rotation.setFromRotationMatrix(this.pivot2.matrix);
     this.speed = data['s'];
@@ -73,8 +63,7 @@ l3.objects.Player.prototype.deserialize = function(data) {
  */
 l3.objects.Player.prototype.serializeState = function() {
     return { 'm': this.move,
-             'x': this.mouseX,
-             'r': Math.floor(this.pivot.rotation.y / Math.PI * 16000)
+             'x': this.rotation
            };
 };
 
@@ -84,8 +73,7 @@ l3.objects.Player.prototype.serializeState = function() {
  */
 l3.objects.Player.prototype.deserializeState = function(data) {
     this.move = data['m'];
-    this.mouseX = data['x'];
-    this.pivot.rotation.y = data['r'] * Math.PI / 16000;
+    this.rotation = data['x'];
 };
 
 /**
@@ -94,27 +82,17 @@ l3.objects.Player.prototype.deserializeState = function(data) {
  */
 l3.objects.Player.prototype.update = function(delta) {
     this.speed = Math.max(0.5, this.speed - 1 * delta);
-    this.pivot.rotation.y += this.speed*delta;
-    if (this.pivot.rotation.y > Math.PI*2) {
-        this.pivot.rotation.y -= Math.PI*2;
-    } else if (this.pivot.rotation.y < 0) {
-        this.pivot.rotation.y += Math.PI*2;
-    }
+    this.pivot.rotation.y = (this.pivot.rotation.y + this.speed*delta) % (Math.PI*2);
 
     // Change orbit.
-    if (this.mouseX !== 0) {
-        var sign = (typeof this.mouseX === 'number' ? this.mouseX ? this.mouseX < 0 ? -4 : 4 : this.mouseX === this.mouseX ? 0 : NaN : NaN);
-        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), sign * delta);
+    if (this.rotation!== 0) {
+        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), this.rotation * delta * 0.1);
     }
 
     // Speed up.
     if (this.move === true) {
         this.speed = Math.min(1.6, this.speed + 2 * delta);
     }
-
-    /*if (this.attack === true) {
-        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, 1).applyEuler(this.pivot.rotation), -0.02 * delta);
-    }*/
 };
 
 /**

@@ -16,6 +16,22 @@
     }
 }
 
+/** Panel in the middle of the gamescreen for connection info */
+#game-panel {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 40%;
+    min-height: 10%;
+    margin-left: -20%;
+    margin-top: -5%;
+}
+
+#game-panel .btn {
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+
 /** Menu button for mobile devices */
 #menubutton {
     font-size: 1.5em;

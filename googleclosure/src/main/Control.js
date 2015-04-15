@@ -24,8 +24,8 @@ l3.main.Control = function(game) {
 		self.keys[e.keyCode] = false;
 	});
 	game.addEventListener('mousemove', function(e) {
-		self.mouseX =  e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0;
-		self.mouseY = e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0;
+		self.mouseX +=  (e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0) % 5;
+		self.mouseY += (e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0) % 5;
 
 		/*self.mouseX = e.pageX;
 		self.mouseY = e.pageY;*/
@@ -145,9 +145,7 @@ l3.main.Control.prototype.update = function() {
 	if (myself === undefined) {
 		return;
 	}
-
-	players[myself].mouseX = this.mouseX;
-	this.mouseX = 0;
+	//players[myself].mouseX = this.mouseX;
 	players[myself].move = this.keys[l3.main.Control.Mouse.LEFT];
 	//players[myself].attack = this.keys[l3.main.Control.Mouse.RIGHT];
 	//players[myself].scroll = this.mouseWheel > 0 ? 1 : this.mouseWheel < 0 ? -1: 0;
