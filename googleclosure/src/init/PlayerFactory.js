@@ -2,7 +2,6 @@ goog.provide('l3.init.PlayerFactory');
 
 goog.require('l3.objects.StateMachine');
 goog.require('l3.objects.Player');
-goog.require('l3.objects.Bot');
 
 /**
  * Sets up a wizard player.
@@ -11,7 +10,7 @@ goog.require('l3.objects.Bot');
  */
 l3.init.PlayerFactory.Wizard = function(position) {
     // animatable model.
-    var model = downloader.addClone('wizard', position, new THREE.Euler(0, 0, -Math.PI/2, 'XYZ'));
+    var model = downloader.addClone('wizard', position, new THREE.Euler(0, -Math.PI/2, -Math.PI/2, 'XYZ'));
     model.material.materials[0].map = downloader.get('hero1Skin');
     l3.init.PlayerFactory.SetAnimations(model);
     model.canMove = true;
@@ -30,8 +29,8 @@ l3.init.PlayerFactory.Wizard = function(position) {
     // Show extra lines while debugging
     if (debug === true) {
         // Show the player's wireframe
-        var edges = new THREE.EdgesHelper(model, 0x00ff00, 20);
-        scene2.add(edges);
+        player.reticle = new THREE.EdgesHelper(model, 0x00ff00, 20);
+        scene2.add(player.reticle);
 
         // Show the player's orbit
         var circleGeometry = new THREE.CircleGeometry(25, 32);

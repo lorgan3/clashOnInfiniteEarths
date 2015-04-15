@@ -5,12 +5,16 @@ goog.provide('l3.helpers.ObjectHandler');
  * @constructor
  */
 l3.helpers.ObjectHandler = function() {
+    /**
+     * An array that contains all object that will be updated.
+     * @type {Array.<l3.objects.BaseObject>}
+     */
     this.objects = [];
 };
 
 /**
  * Adds an object to the updater
- * @param {Object} object Adds an object to the updater.
+ * @param {l3.objects.BaseObject} object Adds an object to the updater.
  */
 l3.helpers.ObjectHandler.prototype.add = function(object) {
     this.objects.push(object);
@@ -23,7 +27,7 @@ l3.helpers.ObjectHandler.prototype.add = function(object) {
 
 /**
  * Removes an object from the updater.
- * @param  {Object} object The object that you want to remove.
+ * @param  {l3.objects.BaseObject} object The object that you want to remove.
  */
 l3.helpers.ObjectHandler.prototype.remove = function(object) {
     this.objects.splice(this.objects.indexOf(object), 1);
@@ -52,18 +56,17 @@ l3.helpers.ObjectHandler.prototype.removeAt = function(index) {
  */
 l3.helpers.ObjectHandler.prototype.update = function(delta) {
     for(var i in this.objects) {
-        this.objects[i].update(delta);
+        var obj = this.objects[i];
+        obj.update(delta);
 
-        // Detect if this object is colliding with another object in the 3d space.
-        var v1 = new THREE.Vector3().setFromMatrixPosition( players[i].model.matrixWorld );
-        for(var j in players) {
+        // Check for collisions
+        for(var j in this.objects) {
             if (i === j) {
                 continue;
             }
-            var v2 = new THREE.Vector3().setFromMatrixPosition( players[j].model.matrixWorld );
 
-            if (v1.distanceTo(v2) < 2) {
-                console.log('hit!');
+            if (obj.worldposition.distanceTo(this.objects[j].worldposition) < (obj.size + this.objects[j].size) / 2) {
+                obj.collide(this.objects[j]);
                 break;
             }
         }

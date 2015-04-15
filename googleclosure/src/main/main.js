@@ -24,7 +24,7 @@ var enemies = [];
  * @const
  * @type {boolean}
  */
-var debug = true;
+var debug = false;
 
 var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panelHelper,
     networker, downloader, collisionHelper, pointerLockHelper, control, webGLRenderer, spotLight, light, clock;
@@ -45,19 +45,20 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     scene = new THREE.Scene();
     scene2 = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.rotation.x = -1.35;
+    camera.rotation.x = -1.28;
     console.log(camera);
 
     // Various objects to help with the game.
     panelHelper = new l3.helpers.PanelHelper(document.getElementById('container'));
     animationListener = new l3.helpers.AnimationListener();
     objectHandler = new l3.helpers.ObjectHandler();
-    cameraHelper = new l3.helpers.CameraHelper(camera, new THREE.Vector3(0, 40, 5));
+    cameraHelper = new l3.helpers.CameraHelper(camera, new THREE.Vector3(0, 40, 10));
     networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport);
     downloader = new l3.init.Downloader();
     collisionHelper = new l3.helpers.CollisionHelper(false);
     pointerLockHelper = new l3.helpers.PointerLockHelper();
     control = new l3.main.Control(game);
+    particleHandler = new l3.helpers.ParticleHandler();
 
     // Start the game once all materials and objects are download.
     downloader.readyCallback = function() {
@@ -92,7 +93,7 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
 
             myself = 0;
             players[myself].model.add(camera);
-        }
+       }
     };
 
     // create a render and set the size
@@ -113,7 +114,7 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     // add spotlight for the shadows
     spotLight = new THREE.SpotLight(0xdddddd);
     spotLight.position.set(100, 100, 0);
-    spotLight.intensity = 1.5;
+    spotLight.intensity = 1;
     scene.add(spotLight);
 
     light = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
@@ -154,7 +155,7 @@ function render() {
         if (totalDelta >= 0.05 && myself !== undefined) {
             totalDelta = 0;
             players[myself].rotation = control.pointerX;
-            control.mouseX = 0;
+            control.pointerX = 0;
             networker.serializeState();
         }
 
@@ -174,8 +175,8 @@ function render() {
 
     webGLRenderer.clear();
     webGLRenderer.render(scene, camera);
-    //webGLRenderer.clearDepth();
-    //webGLRenderer.render(scene2, camera);
+    webGLRenderer.clearDepth();
+    webGLRenderer.render(scene2, camera);
 
     stats.update();
 }

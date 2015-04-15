@@ -40,7 +40,7 @@
                         <span class="label label-danger">Not recommended for mobile</span>
                     </p>
                     <div class="btn-group btn-group-justified" role="group" aria-label="...">
-                        <a ng-click="host()" class="btn btn-primary" role="button">Host</a>
+                        <a ng-click="host()" ng-class="signedIn() ? '' : 'disabled'" class="btn btn-primary" role="button">Host</a>
                     </div>
                 </div>
             </div>

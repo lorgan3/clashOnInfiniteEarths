@@ -12,18 +12,11 @@ l3.helpers.ParticleHandler = function() {
 
 /**
  * Adds a particle system.
- * @param {Object}                     position  The spawn position.
- * @param {Object}                     offset    Maximum random offset from spawn position.
- * @param {Object}                     direction The direction of the particles.
- * @param {number}                     speed     The speed of the particles.
- * @param {number}                     speed_var The speed variation.
- * @param {number}                     length    The length of the particle stream.
- * @param {number}                     density   The density of the particle stream (the amount of particles that get placed every update).
- * @param {number}                     color     The color of the particles.
- * @return {l3.helpers.ParticleSystem}           The created particlesystem.
+ * @param  {Object}                    options The options for this particlesystem.
+ * @return {l3.helpers.ParticleSystem} The created particlesystem.
  */
-l3.helpers.ParticleHandler.prototype.add = function(position, offset, direction, speed, speed_var, length, density, color) {
-    var system = new l3.helpers.ParticleSystem(position, offset, direction, speed, speed_var, length, density, color);
+l3.helpers.ParticleHandler.prototype.add = function(options) {
+    var system = new l3.helpers.ParticleSystem(options);
     this.system.add(system.cloud);
     return system;
 };
@@ -32,26 +25,19 @@ l3.helpers.ParticleHandler.prototype.add = function(position, offset, direction,
  * Updates all child particle systems.
  */
 l3.helpers.ParticleHandler.prototype.update = function() {
+    console.log(this.system.children);
     for(var i in this.system.children) {
         var system = this.system.children[i];
 
-        if (system._index === system._lastIndex) {
+        /*if (system._index === system._lastIndex) {
             this.system.remove(system);
             continue;
-        }
+        }*/
 
-        for(var j=0; j<system._density; j+=1) {
-            system.geometry.vertices[system._index]
-                .copy(system._position)
-                .add(new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5)
-                    .multiply(system._offset));
-
-            system._index = (system._index+1) % system.geometry.vertices.length;
-        }
-        for(var k in system.geometry.vertices) {
-            system.geometry.vertices[k].add(system.geometry.vertices[k]._direction);
+        for(var j in system.geometry.vertices) {
+            system.geometry.vertices[j].add(system.geometry.vertices[j].drift);
         }
 
         system.geometry.verticesNeedUpdate = true;
     }
-};  
+};
