@@ -153,7 +153,7 @@ function render() {
         totalDelta += delta;
         if (totalDelta >= 0.05 && myself !== undefined) {
             totalDelta = 0;
-            players[myself].rotation = control.mouseX;
+            players[myself].rotation = control.pointerX;
             control.mouseX = 0;
             networker.serializeState();
         }
