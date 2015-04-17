@@ -74,24 +74,18 @@ l3.objects.Player = function(model, stateMachine, options) {
     this.system = particleHandler.add({ 'amount': 250, 'directions': new THREE.Vector3(0.008, 0.008, 0), 'size': 3, 'map': downloader.get('smoke') });
 };
 
-/**
- * A function that returns a json object with all values that should be synced.
- * @return {Object} A json object containing all values that should be synced.
- */
+/** @inheritDoc */
 l3.objects.Player.prototype.serialize = function() {
-    return { 'r': Math.floor(this.pivot.rotation.y / Math.PI * 1600),
+    return { 'r': this.pivot.rotation.y,
              'd': new Float32Array(this.pivot2.matrix.elements),
              's': this.speed,
              'h': this.hp
            };
 };
 
-/**
- * A function that deserializes the data from the serialize method.
- * @param  {Object} data A json object containing all values that should be synced.
- */
+/** @inheritDoc */
 l3.objects.Player.prototype.deserialize = function(data) {
-    this.pivot.rotation.y = data['r'] * Math.PI / 1600;
+    this.pivot.rotation.y = data['r'];
     this.pivot2.matrix.elements = new Float32Array(data['d']);
     this.pivot2.rotation.setFromRotationMatrix(this.pivot2.matrix);
     this.speed = data['s'];
@@ -116,10 +110,7 @@ l3.objects.Player.prototype.deserializeState = function(data) {
     this.rotation = data['x'];
 };
 
-/**
- * Function that updates the enity.
- * @param  {number} delta The time in ms since the last update.
- */
+/** @inheritDoc */
 l3.objects.Player.prototype.update = function(delta) {
     // Update the worldposition.
     this.worldposition.setFromMatrixPosition(this.model.matrixWorld);
@@ -162,17 +153,12 @@ l3.objects.Player.prototype.rotateAroundObjectAxis = function(object, axis, radi
     object.rotation.setFromRotationMatrix(object.matrix);
 }
 
-/**
- * A handler that gets executed when this object collides with another.
- * @param {l3.objects.BaseObject} other The other object.
- */
+/** @inheritDoc */
 l3.objects.Player.prototype.collide = function(other) {
     console.log('hit!');
 };
 
-/**
- * Function that destroys the entity.
- */
+/** @inheritDoc */
 l3.objects.Player.prototype.destroy = function() {
     scene.remove(this.pivot2);
     if (this.reticle !== undefined) {

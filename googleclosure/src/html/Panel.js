@@ -1,11 +1,11 @@
-goog.provide('l3.helpers.PanelHelper');
+goog.provide('l3.html.Panel');
 
 /**
  * Creates a pure HTML panel that can display messages.
  * @constructor
  * @param {HTMLElement} container The element to add this panel to.
  */
-l3.helpers.PanelHelper = function(container) {
+l3.html.Panel = function(container) {
     /**
      * The panel to display messages.
      * @type {Element}
@@ -54,7 +54,7 @@ l3.helpers.PanelHelper = function(container) {
  * An enum that describes the panelstyles.
  * @enum {string}
  */
-l3.helpers.PanelHelper.types = {
+l3.html.Panel.types = {
     PRIMARY: 'primary',
     SUCCESS: 'success',
     INFO: 'info',
@@ -64,13 +64,13 @@ l3.helpers.PanelHelper.types = {
 
 /**
  * Sets the panel content
- * @param {l3.helpers.PanelHelper.types} type     The panel type.
- * @param {string}                       title    The panel title. Not for user input!.
- * @param {string}                       content  The panel content. Not for user input!
- * @param {number=}                      progress The progress in the progressbar.
- * @param {boolean=}                     critical Should there be a button to exit the game?
+ * @param {l3.html.Panel.types} type The panel type.
+ * @param {string}              title    The panel title. Not for user input!.
+ * @param {string}              content  The panel content. Not for user input!
+ * @param {number=}             progress The progress in the progressbar.
+ * @param {boolean=}            critical Should there be a button to exit the game?
  */
-l3.helpers.PanelHelper.prototype.set = function(type, title, content, progress, critical) {
+l3.html.Panel.prototype.set = function(type, title, content, progress, critical) {
     this.panel.style.display = 'block';
     this.panel.className = 'panel panel-' + type;
 
@@ -94,7 +94,7 @@ l3.helpers.PanelHelper.prototype.set = function(type, title, content, progress, 
  * Updates the progressbar amount. The panel will be hidden when the progress is set to 100!
  * @param  {number=} progress The progress count.
  */
-l3.helpers.PanelHelper.prototype.updateProgress = function(progress) {
+l3.html.Panel.prototype.updateProgress = function(progress) {
     if (this.progress === undefined || progress === undefined) {
         return
     }
@@ -110,6 +110,6 @@ l3.helpers.PanelHelper.prototype.updateProgress = function(progress) {
 /**
  * Hides the panel.
  */
-l3.helpers.PanelHelper.prototype.hide = function() {
+l3.html.Panel.prototype.hide = function() {
     this.panel.style.display = 'none';
 };

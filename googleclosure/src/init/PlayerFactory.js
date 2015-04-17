@@ -22,6 +22,7 @@ l3.init.PlayerFactory.Wizard = function(position) {
     // animationstates
     var stateMachine = new l3.objects.StateMachine(model);
     var player = new l3.objects.Player(model, stateMachine, {maxHp: 200});
+    objectHandler.add(player);
     player.reticle = new THREE.Mesh(new THREE.SphereGeometry(0.3, 2, 2), new THREE.MeshBasicMaterial({ color: 0xff0000, 'wireframe': true }));
     scene2.add(player.reticle);
 
@@ -37,6 +38,24 @@ l3.init.PlayerFactory.Wizard = function(position) {
         player.pivot.add(circle);
     }
     return player;
+};
+
+/**
+ * Sets up an astroid.
+ * @param  {Object=}            position The position to place the astroid.
+ * @return {l3.objects.Astroid}          The wizard.
+ */
+l3.init.PlayerFactory.Astroid = function(position) {
+    var model = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshLambertMaterial({ color: 0x965D2F }));
+    model.position.copy(position);
+
+    var astroid = new l3.objects.Astroid(model);
+    objectHandler.add(astroid);
+
+    // Add the astroid's 2nd pivot to the scene rather than the model itself for the orbit to work.
+    scene.add(astroid.pivot2);
+
+    return astroid;
 };
 
 /**

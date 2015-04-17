@@ -37,13 +37,12 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
                 other.peerId = self.peers.length;
 
                 var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
-                objectHandler.add(player);
                 this.sendFullUpdate(other);
                 console.log('opened');
             });
         });
     } else if (token !== undefined) {
-        panelHelper.set(l3.helpers.PanelHelper.types.INFO, 'Connection to server', 'Connecting to the server...', 0);
+        panel.set(l3.html.Panel.types.INFO, 'Connecting', 'Connecting to the server...', 0);
         this.peer = new Peer(options);
         this.connection = this.peer.connect(token);
         this.addListeners(this.connection);
@@ -51,13 +50,13 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
         this.peer.on('error', function(error) {
             switch(error.type) {
                 case 'browser-incompatible':
-                    panelHelper.set(l3.helpers.PanelHelper.types.DANGER, 'Incompatible browser!', 'Please use a newer browser (not internet explorer).', undefined, true);
+                    panel.set(l3.html.Panel.types.DANGER, 'Incompatible browser!', 'Please use a newer browser (not internet explorer).', undefined, true);
                 break;
                 case 'peer-unavailable':
-                     panelHelper.set(l3.helpers.PanelHelper.types.DANGER, 'Peer unavailable!', 'Can\'t connect to the selected server.', undefined, true);
+                     panel.set(l3.html.Panel.types.DANGER, 'Peer unavailable!', 'Can\'t connect to the selected server.', undefined, true);
                 break;
                 default:
-                    panelHelper.set(l3.helpers.PanelHelper.types.DANGER, error.type, error.message, undefined, true);
+                    panel.set(l3.html.Panel.types.DANGER, error.type, error.message, undefined, true);
                 break;
             }
         });
@@ -74,7 +73,7 @@ l3.main.Networking.States = {
     QUICK: 3,
     PLAYER_JOIN: 4,
     PLAYER_LEAVE: 5,
-    OBJECT_DEATH: 6
+    RESET: 6
 };
 
 /**
@@ -102,7 +101,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 j++;
             }
         } else {
-            panelHelper.set(l3.helpers.PanelHelper.types.DANGER, 'Disconnected!', 'Lost connection to the server.', undefined, true);
+            panel.set(l3.html.Panel.types.DANGER, 'Disconnected!', 'Lost connection to the server.', undefined, true);
         }
     });
 
@@ -113,7 +112,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
     connection.on('data', function(data) {
         if (self.connected === false) {
             self.connected = true;
-            panelHelper.hide();
+            panel.hide();
         }
 
         if (self.isHost === true) {
@@ -132,14 +131,13 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 break;
                 case l3.main.Networking.States.FULL:
                     this.receiveFullUpdate(data);
+
                     myself = data['i'];
                     cameraHelper.setUp();
                 break;
                 case l3.main.Networking.States.PLAYER_JOIN:
                     var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
                     player.name = data['n'];
-
-                    objectHandler.add(player);
                 break;
                 case l3.main.Networking.States.PLAYER_LEAVE:
                     var player = players[data['i']];
@@ -148,8 +146,8 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                     player.destroy();
                     myself = players.indexOf(myPlayer);
                 break;
-                case l3.main.Networking.States.OBJECT_DEATH:
-                    this.removeEnemy(data['i']);
+                case l3.main.Networking.States.RESET:
+                    this.clearLevel();
                 break;
             }
         }
@@ -157,19 +155,10 @@ l3.main.Networking.prototype.addListeners = function(connection) {
 };
 
 /**
- * Kills an enemy and removes it.
- * @param  {number} index The index of the object that should die.
+ * Clears the level.
  */
-l3.main.Networking.prototype.removeEnemy = function(index) {
-    var object = enemies[index];
-    objectHandler.remove(object);
-
-    enemies.splice(index, 1);
-
-    object.model.animations[1].play();
-    animationListener.onEnd(object.model.animations[1], function(e) {
-        object.destroy();
-    });
+l3.main.Networking.prototype.clearLevel = function() {
+    // TODO
 };
 
 /**
@@ -178,14 +167,14 @@ l3.main.Networking.prototype.removeEnemy = function(index) {
  */
 l3.main.Networking.prototype.sendFullUpdate = function(peer) {
     var data = [];
-    for(var i in players) {
+    for (var i in players) {
         data.push(players[i].serialize());
     }
-    for(var i in enemies) {
-        data.push(enemies[i].serialize());
+    for (var i in astroids) {
+        data.push(astroids[i].serialize());
     }
 
-    peer.send({'a': l3.main.Networking.States.FULL, 'p': players.length, 'b': enemies.length, 'd': data, 'i': peer.peerId});
+    peer.send({'a': l3.main.Networking.States.FULL, 'p': players.length, 'b': astroids.length, 'd': data, 'i': peer.peerId});
 };
 
 /**
@@ -193,20 +182,22 @@ l3.main.Networking.prototype.sendFullUpdate = function(peer) {
  * @param  {Object} data The fullupdate data.
  */
 l3.main.Networking.prototype.receiveFullUpdate = function(data) {
-    for(var i=0; i<data['p']; i++) {
-        var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
-        objectHandler.add(player);
+    for (var i=0; i<data['p']; i++) {
+        l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
     }
 
+    for (var i=0; i<data['b']; i++) {
+        l3.init.PlayerFactory.Astroid(new THREE.Vector3(0, 0, 22));
+    }
+
+
     var j = 0;
-    for(var i in players) {
-        if (j !== myself) {
-            players[i].deserialize(data['d'][j]);
-        }
+    for (var i in players) {
+        players[i].deserialize(data['d'][j]);
         j++;
     }
-    for(var i in enemies) {
-        enemies[i].deserialize(data['d'][j]);
+    for (var i in astroids) {
+        astroids[i].deserialize(data['d'][j]);
         j++;
     }
 };
@@ -220,11 +211,11 @@ l3.main.Networking.prototype.sendQuickUpdate = function() {
     }
 
     var data = [];
-    for(var i in players) {
+    for (var i in players) {
         data.push(players[i].serialize());
     }
-    for(var i in enemies) {
-        data.push(enemies[i].serialize());
+    for (var i in astroids) {
+        data.push(astroids[i].serialize());
     }
 
     this.broadcast({'a': l3.main.Networking.States.QUICK, 'd': data});
@@ -236,14 +227,12 @@ l3.main.Networking.prototype.sendQuickUpdate = function() {
  */
 l3.main.Networking.prototype.receiveQuickUpdate = function(data) {
     var j = 0;
-    for(var i in players) {
-        //if (i !== myself) {
-            players[i].deserialize(data[j]);
-        //}
+    for (var i in players) {
+        players[i].deserialize(data[j]);
         j++;
     }
-    for(var i in enemies) {
-        enemies[i].deserialize(data[j]);
+    for (var i in astroids) {
+        astroids[i].deserialize(data[j]);
         j++;
     }
 };

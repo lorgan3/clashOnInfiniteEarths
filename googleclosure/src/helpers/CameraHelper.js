@@ -29,12 +29,16 @@ l3.helpers.CameraHelper.prototype.setUp = function() {
 
     if (myself === undefined || myself < 0) {
         this.target = world;
-        world.add(this.camera);
-        this.camera.position.set(0, 0, 200);
-        //this.camera.lookAt(world.position);
+        this.camera.position.set(0, 0, 100);
+        this.camera.lookAt(world.position);
+        this.target.add(this.camera);
     } else {
         this.target = players[myself].model;
+
         this.target.add(this.camera);
+        this.camera.rotation.x = -1.20;
+        this.camera.rotation.y = 0;
+        this.camera.rotation.z = 0;
         this.camera.position.set(0, 50, 10);
 
         scene2.remove(players[myself].reticle);

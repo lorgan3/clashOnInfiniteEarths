@@ -10,6 +10,12 @@ l3.helpers.ObjectHandler = function() {
      * @type {Array.<l3.objects.BaseObject>}
      */
     this.objects = [];
+
+    /**
+     * Is this the first frame?
+     * @type {boolean}
+     */
+    this.firstFrame = true;
 };
 
 /**
@@ -22,6 +28,8 @@ l3.helpers.ObjectHandler.prototype.add = function(object) {
     // Also add to the players array.
     if (object instanceof l3.objects.Player) {
         players.push(object);
+    } else if (object instanceof l3.objects.Astroid) {
+        astroids.push(object);
     }
 };
 
@@ -34,6 +42,8 @@ l3.helpers.ObjectHandler.prototype.remove = function(object) {
 
     if (object instanceof l3.objects.Player) {
         players.splice(players.indexOf(object), 1);
+    } else if (object instanceof l3.objects.Astroid) {
+        astroids.splice(astroids.indexOf(object), 1);
     }
 };
 
@@ -45,6 +55,8 @@ l3.helpers.ObjectHandler.prototype.removeAt = function(index) {
     var object = this.objects[index];
     if (object instanceof l3.objects.Player) {
         players.splice(players.indexOf(object), 1);
+    } else if (object instanceof l3.objects.Astroid) {
+        astroids.splice(astroids.indexOf(object), 1);
     }
 
     this.objects.splice(index, 1);
@@ -59,16 +71,19 @@ l3.helpers.ObjectHandler.prototype.update = function(delta) {
         var obj = this.objects[i];
         obj.update(delta);
 
-        // Check for collisions
-        for(var j in this.objects) {
-            if (i === j) {
-                continue;
-            }
+        if (this.firstFrame === false) {
+            // Check for collisions
+            for(var j in this.objects) {
+                if (i === j) {
+                    continue;
+                }
 
-            if (obj.worldposition.distanceTo(this.objects[j].worldposition) < (obj.size + this.objects[j].size) / 2) {
-                obj.collide(this.objects[j]);
-                break;
+                if (obj.worldposition.distanceTo(this.objects[j].worldposition) < (obj.size + this.objects[j].size) / 2) {
+                    obj.collide(this.objects[j]);
+                    break;
+                }
             }
         }
     }
+    this.firstFrame = false;
 };

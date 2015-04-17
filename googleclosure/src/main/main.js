@@ -10,13 +10,13 @@ goog.require('l3.main.Networking');
 goog.require('l3.init.Downloader');
 goog.require('l3.init.PlayerFactory');
 goog.require('l3.helpers.CollisionHelper');
-goog.require('l3.helpers.PanelHelper');
-
+goog.require('l3.html.Panel');
+goog.require('l3.objects.Astroid');
 goog.require('l3.helpers.PointerLockHelper');
 
-var stats, myself, world;
+var stats, world;
 var players = [];
-var enemies = [];
+var astroids = [];
 
 /**
  * Show debug information?
@@ -26,7 +26,13 @@ var enemies = [];
  */
 var debug = false;
 
-var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panelHelper,
+/**
+ * A number that indicates which character in the Players array that you control.
+ * @type {number|undefined}
+ */
+var myself = undefined;
+
+var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panel,
     networker, downloader, collisionHelper, pointerLockHelper, control, webGLRenderer, spotLight, light, clock;
 
 /**
@@ -45,11 +51,9 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     scene = new THREE.Scene();
     scene2 = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.rotation.x = -1.20;
-    console.log(camera);
 
     // Various objects to help with the game.
-    panelHelper = new l3.helpers.PanelHelper(document.getElementById('container'));
+    panel = new l3.html.Panel(document.getElementById('container'));
     animationListener = new l3.helpers.AnimationListener();
     objectHandler = new l3.helpers.ObjectHandler();
     cameraHelper = new l3.helpers.CameraHelper(camera);
@@ -84,7 +88,6 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
 
         if (networker.isHost === true || networker.token === undefined) {
             var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
-            objectHandler.add(player);
 
             // Randomize
             player.pivot2.rotation.x = Math.random() * Math.PI * 2;
@@ -93,9 +96,17 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
 
             myself = 0;
             cameraHelper.setUp();
+
+            //for(var i=0; i<20; i++) {
+                var astroid = l3.init.PlayerFactory.Astroid(new THREE.Vector3(0, 0, 22));
+
+                astroid.pivot2.rotation.x = Math.random() * Math.PI * 2;
+                astroid.pivot2.rotation.y = Math.random() * Math.PI * 2;
+                astroid.pivot2.rotation.z = Math.random() * Math.PI * 2;
+            //}
        }
 
-       particleHandler.add({ 'amount': 100, 'directions': new THREE.Vector3(0.3, 0.3, 0.01), 'size': 5, 'map': downloader.get('particle'), 'color': 0xff0000, 'emit': 4, 'position': new THREE.Vector3(0, 0, 10.5) });
+       //particleHandler.add({ 'amount': 100, 'directions': new THREE.Vector3(0.3, 0.3, 0.01), 'size': 5, 'map': downloader.get('particle'), 'color': 0xff0000, 'emit': 4, 'position': new THREE.Vector3(0, 0, 10.5) });
     };
 
     // create a render and set the size
@@ -139,7 +150,7 @@ function render() {
 
     // Update the progressbar
     if (networker.connected === false) {
-        panelHelper.updateProgress(panelHelper.progress + delta*20);
+        panel.updateProgress(panel.progress + delta*20);
     }
 
     if (downloader.ready) {

@@ -20,12 +20,17 @@ l3.objects.BaseObject.prototype.serialize = function() {};
 
 /**
  * A function that deserializes the data from the serialize method.
- * @param  {Object} json A json object containing all values that should be synced.
+ * @param  {Object} data A json object containing all values that should be synced.
  */
-l3.objects.BaseObject.prototype.deserialize = function(json) {};
+l3.objects.BaseObject.prototype.deserialize = function(data) {};
 
 /**
  * A handler that gets executed when this object collides with another.
  * @param  {l3.objects.BaseObject} other The other object.
  */
 l3.objects.BaseObject.prototype.collide = function(other) {};
+
+/**
+ * Function that destroys the object.
+ */
+l3.objects.BaseObject.prototype.destroy = function() {};
