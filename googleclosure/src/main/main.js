@@ -45,14 +45,14 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     scene = new THREE.Scene();
     scene2 = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.rotation.x = -1.28;
+    camera.rotation.x = -1.20;
     console.log(camera);
 
     // Various objects to help with the game.
     panelHelper = new l3.helpers.PanelHelper(document.getElementById('container'));
     animationListener = new l3.helpers.AnimationListener();
     objectHandler = new l3.helpers.ObjectHandler();
-    cameraHelper = new l3.helpers.CameraHelper(camera, new THREE.Vector3(0, 40, 10));
+    cameraHelper = new l3.helpers.CameraHelper(camera);
     networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport);
     downloader = new l3.init.Downloader();
     collisionHelper = new l3.helpers.CollisionHelper(false);
@@ -83,7 +83,7 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
         }
 
         if (networker.isHost === true || networker.token === undefined) {
-            var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
+            var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
             objectHandler.add(player);
 
             // Randomize
@@ -92,8 +92,10 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
             player.pivot2.rotation.z = Math.random() * Math.PI * 2;
 
             myself = 0;
-            players[myself].model.add(camera);
+            cameraHelper.setUp();
        }
+
+       particleHandler.add({ 'amount': 100, 'directions': new THREE.Vector3(0.3, 0.3, 0.01), 'size': 5, 'map': downloader.get('particle'), 'color': 0xff0000, 'emit': 4, 'position': new THREE.Vector3(0, 0, 10.5) });
     };
 
     // create a render and set the size
@@ -145,10 +147,7 @@ function render() {
         objectHandler.update(delta);
 
         control.update();
-        cameraHelper.update();
-        if (particleHandler !== undefined) {
-            particleHandler.update();
-        }
+        particleHandler.update();
         animationListener.update();
 
         totalDelta += delta;
@@ -162,17 +161,12 @@ function render() {
         totalDelta2 += delta;
         if (totalDelta2 >= 1 && networker.isHost === true) {
             totalDelta2 = 0;
-            /*for(var i in enemies) {
-                enemies[i].aiUpdate();
-            }*/
             networker.sendQuickUpdate();
         }
     }
 
-
     // render using requestAnimationFrame
     requestAnimationFrame(render);
-
     webGLRenderer.clear();
     webGLRenderer.render(scene, camera);
     webGLRenderer.clearDepth();

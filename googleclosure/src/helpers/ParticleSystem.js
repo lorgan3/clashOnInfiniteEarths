@@ -45,6 +45,26 @@ l3.helpers.ParticleSystem = function(options) {
     this.cloud = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({ 'size': size, 'color': color, 'blending': THREE.AdditiveBlending, 'transparent': true, 'map': map }));
     this.cloud.offset = 0;
     this.cloud.directions = directions;
+
+    /**
+     * Particles that get spawned automatically.
+     * @type {number}
+     */
+    this.cloud.emit = options['emit'] || 0;
+
+    /**
+     * The position of the particle system (for emitting)
+     * @type {Object}
+     */
+    var pos = options['position'];
+    if (pos != undefined) {
+        this.cloud.position.set(pos.x, pos.y, pos.z);
+    }
+
+    this.cloud.lastOffset = -1;
+    this.cloud.die = false;
+    this.cloud.active = true;
+    this.cloud.system = this;
 };
 
 /**
@@ -75,6 +95,15 @@ l3.helpers.ParticleSystem.prototype.spawn = function(position, rotation, randomn
  */
 l3.helpers.ParticleSystem.prototype.remove = function() {
     particleHandler.system.remove(this.cloud);
+};
+
+/**
+ * Makes the particle system fade out.
+ * @param  {boolean} remove Should the particle system be removed once it's finished fading?
+ */
+l3.helpers.ParticleSystem.prototype.fade = function(remove) {
+    this.cloud.lastOffset = (this.cloud.offset - 1 + this.cloud.geometry.vertices.length) % this.cloud.geometry.vertices.length;
+    this.cloud.die = remove;
 };
 
 /**
