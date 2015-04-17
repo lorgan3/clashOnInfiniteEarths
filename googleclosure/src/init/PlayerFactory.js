@@ -22,17 +22,14 @@ l3.init.PlayerFactory.Wizard = function(position) {
     // animationstates
     var stateMachine = new l3.objects.StateMachine(model);
     var player = new l3.objects.Player(model, stateMachine, {maxHp: 200});
+    player.reticle = new THREE.Mesh(new THREE.SphereGeometry(0.3, 2, 2), new THREE.MeshBasicMaterial({ color: 0xff0000, 'wireframe': true }));
+    scene2.add(player.reticle);
 
     // Add the players 2nd pivot to the scene rather than the model itself for the orbit to work.
     scene.add(player.pivot2);
 
-    // Show extra lines while debugging
+    // Show the player's orbit
     if (debug === true) {
-        // Show the player's wireframe
-        player.reticle = new THREE.EdgesHelper(model, 0x00ff00, 20);
-        scene2.add(player.reticle);
-
-        // Show the player's orbit
         var circleGeometry = new THREE.CircleGeometry(25, 32);
         circleGeometry.vertices.shift(); // Remove the center vertex
         var circle = new THREE.Line( circleGeometry, new THREE.LineBasicMaterial({ color: 0x00ff00 }));

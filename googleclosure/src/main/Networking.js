@@ -36,7 +36,7 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
                 self.peers.push(other);
                 other.peerId = self.peers.length;
 
-                var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
+                var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
                 objectHandler.add(player);
                 this.sendFullUpdate(other);
                 console.log('opened');
@@ -133,10 +133,10 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 case l3.main.Networking.States.FULL:
                     this.receiveFullUpdate(data);
                     myself = data['i'];
-                    players[myself].model.add(camera);
+                    cameraHelper.setUp();
                 break;
                 case l3.main.Networking.States.PLAYER_JOIN:
-                    var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 25));
+                    var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
                     player.name = data['n'];
 
                     objectHandler.add(player);
