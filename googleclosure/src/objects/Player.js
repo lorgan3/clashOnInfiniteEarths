@@ -127,18 +127,24 @@ l3.objects.Player.prototype.update = function(delta) {
     // Add new particles.
     this.system.spawn(this.worldposition, this.pivot2.rotation, 0.5);
 
+    // Move the reticle into position.
+    if (this.reticle !== undefined) {
+        this.reticle.position.setFromMatrixPosition(this.model.matrixWorld);
+    }
+
     // Set the speed and move the player in orbit.
-    this.speed = Math.max(0.5, this.speed - 1 * delta);
+    this.speed = Math.max(0.25, this.speed - 1 * delta);
     this.pivot.rotation.y = (this.pivot.rotation.y + this.speed*delta) % (Math.PI*2);
 
     // Change orbit.
-    if (this.rotation!== 0) {
+    if (this.rotation !== 0) {
+        this.rotation = Math.max(-15, Math.min(15, this.rotation));
         this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), this.rotation * delta * 0.1);
     }
 
     // Speed up.
     if (this.move === true) {
-        this.speed = Math.min(1.6, this.speed + 2 * delta);
+        this.speed = Math.min(1, this.speed + 2 * delta);
     }
 };
 

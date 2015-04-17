@@ -25,8 +25,8 @@ l3.main.Control = function(game) {
     if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', function(e) {
             // e.gamma (up/down), e.beta (rotate), e.alpha (left/right)
-            self.pointerX = (e.beta) % 60;
-            self.pointerY = (e.gamma) % 60;
+            self.pointerX = e.beta;
+            self.pointerY = e.gamma;
         });
     }
 
