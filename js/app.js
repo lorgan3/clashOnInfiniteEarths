@@ -1,4 +1,4 @@
-var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.bootstrap'])
+var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog'])
 
 .run(function($rootScope, ngDialog, Players) {
     $rootScope.user = undefined;
@@ -52,11 +52,24 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'ui.boo
     /**
      * Opens the sign in modal box.
      */
-    $rootScope.signIn = function () {
+    $rootScope.showSignIn = function () {
+        ngDialog.closeAll();
         ngDialog.open({
             template: 'partials/modals/signIn.html',
             controller: 'modalCtrl',
             data: {modelname: 'user', model: {rememberme: true}}
+        });
+    };
+
+    /**
+     * Opens the sign up modal box.
+     */
+    $rootScope.showSignUp = function () {
+        ngDialog.closeAll();
+        ngDialog.open({
+            template: 'partials/modals/signUp.html',
+            controller: 'modalCtrl',
+            data: {modelname: 'user'}
         });
     };
 

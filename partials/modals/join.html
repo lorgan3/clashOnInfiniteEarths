@@ -3,12 +3,12 @@
     <div ng-hide="servers.length">
         <p>No one is currently hosting.</p>
     </div>
-    <div class="list-group">
-        <a class="list-group-item" ng-click="join(server)" ng-repeat="server in servers">
+    <ul class="list-group">
+        <li class="list-group-item" ng-click="join(server)" ng-repeat="server in servers">
             <h4>{{ server.name }}</h4>
             <span>{{ server.players }}/{{ server.maxPlayers }} players</span><br />
             <span>host: {{ server.owner }}</span><br />
             <span ng-show="server.peerServer" class="label label-danger">Custom peerserver</span>
-        </a>
-    </div>
+        </li>
+    </ul>
 </div>

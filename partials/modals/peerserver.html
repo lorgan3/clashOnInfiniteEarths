@@ -1,4 +1,5 @@
 <div class="ngdialog-message">
+    <h3>Select the peerserver <small>(optional)</small></h3>
     <form role="form" name="hostForm" novalidate>
         <div class="form-group">
             <label for="peerserver">Peer server:</label>
@@ -10,10 +11,10 @@
             <input type="number" min="0" class="form-control" id="peerport" name="peerport" ng-model="server.peerport" />
         </div>
 
-        <button class="btn btn-primary" ng-click="validatePeer()" ng-disabled="hostForm.peerport.$invalid">
+        <button class="btn small" ng-click="validatePeer()" ng-disabled="hostForm.peerport.$invalid">
             Join
         </button>
-        <button class="btn btn-default" ng-click="skipPeer()">
+        <button class="btn btn-clear small" ng-click="skipPeer()">
             Skip
         </button>
     </form>

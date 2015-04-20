@@ -192,11 +192,4 @@ var app = angular.module('l3game')
 
         this.close();
     };
-
-    /*$scope.validatePeer = function() {
-        // Set cookies
-        setCookie('peerserver', this.server.peerserver, 365);
-        setCookie('peerserverport', this.server.peerport, 365);
-    };*/
-
 });

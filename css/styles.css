@@ -1,5 +1,50 @@
-.nav, .pagination, .carousel, .panel-title a {
-    cursor: pointer;
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font-family: verdana;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
 /** Warning message while playing in portrait mode */
@@ -17,7 +62,7 @@
 }
 
 /** Panel in the middle of the gamescreen for connection info */
-#game-panel {
+/*#game-panel {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -30,7 +75,7 @@
 #game-panel .btn {
     margin-left: 15px;
     margin-bottom: 15px;
-}
+}*/
 
 /** Menu button for mobile devices */
 #menubutton {
@@ -54,7 +99,399 @@
     height: 100%;
 }
 
+a {
+    cursor: pointer;
+}
+
 .buttons {
     width: 100%;
     height: 50%;
+}
+
+nav > div {
+    margin-top: 20px;
+}
+
+nav ul, nav ul li {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.btn, nav ul li a {
+    display: inline-block;
+    border: 2px solid #333;
+    border-radius: 25px;
+    width: 150px;
+    background-image: url('../img/comicBg.png');
+    background-color: #FFE685;
+    color: #333;
+    background-blend-mode: multiply;
+    background-size: 10px;
+    padding: 3px;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 2px 2px 5px #FFE685;
+    position: relative;
+    font-size: 18px;
+    height: 20px;
+    box-sizing: content-box !important;
+    font-family: verdana;
+    line-height: 20px;
+    cursor: pointer;
+}
+
+.btn.active, .btn:hover, nav ul li.active a, nav ul li a:hover {
+    top: 1px;
+    left: 1px;
+    box-shadow: none;
+}
+
+.btn.small {
+    width: 100px;
+}
+
+.btn-red {
+    background-color: #FF8080;
+    box-shadow: 2px 2px 5px #FF8080;
+}
+
+.btn-clear {
+    background-color: #fff;
+    box-shadow: 2px 2px 5px #fff;
+}
+
+.navbar-right {
+    float: right;
+    margin-right: 20px;
+    color: #fff;
+}
+
+.navbar-text {
+    text-align: bottom;
+}
+
+@font-face {
+    font-family: comicFont;
+    src: url('../font/Comic Cover.ttf');
+}
+
+body {
+    background-image: url('../img/comicBg.png');
+    background-blend-mode: multiply;
+    background-size: 8px;
+    background-color: #E6F0FF;
+}
+
+.wrapper {
+    width: 960px;
+    margin: 0 auto 20px auto;
+    border: 2px solid #333;
+    background: #eee;
+    box-sizing: border-box;
+    padding: 5px;
+
+    box-shadow: 10px 10px 30px #555;
+}
+.comic-border {
+    margin: 5px;
+    border: 2px solid #333;
+}
+
+h1 {
+    font-family: comicFont;
+    font-size: 3em;
+    text-align: center;
+    text-shadow: 5px 1px #333;
+    padding: 15px;
+    color: #FFE685;
+    line-height: 1.2em;
+}
+
+header {
+    background: url('../img/comicStripes.png');
+    background-size: 932px 140px;
+    height: 140px;
+}
+
+.col-md-3, .col-md-1 {
+    border: 2px solid #333;
+    width: 301px;
+    padding: 10px;
+    margin: 5px;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.col-md-3 .btn {
+    margin-top: 10px;
+    margin-left: 20%;
+}
+
+.col-md-1 {
+    width: 934px;
+    height: 100px;
+}
+
+.form-group label {
+    display: inline-block;
+    width: 200px;
+    padding: 5px 0;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+form .buttons {
+     margin-top: 10px;
+}
+
+form .buttons a {
+    display: inline-block;
+}
+
+h3 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+h4 {
+    margin: 10px 0;
+}
+
+small {
+    font-size: 0.8em;
+}
+
+.list-group-item:not(:last-child) {
+    box-shadow: 0 12px 15px -10px #aaa;
+    padding: 5px 0;
+}
+
+@-webkit-keyframes ngdialog-flyin {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-40px);
+    transform: translateY(-40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes ngdialog-flyin {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-40px);
+    -ms-transform: translateY(-40px);
+    transform: translateY(-40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+@-webkit-keyframes ngdialog-flyout {
+  0% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    display:none;
+    -webkit-transform: translateY(-40px);
+    transform: translateY(-40px);
+  }
+}
+
+@keyframes ngdialog-flyout {
+  0% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    display:none;
+    -webkit-transform: translateY(-40px);
+    -ms-transform: translateY(-40px);
+    transform: translateY(-40px);
+  }
+}
+
+.ngdialog.ngdialog-theme-default.ngdialog-closing .ngdialog-content {
+  -webkit-animation: ngdialog-flyout .5s forwards;
+  animation: ngdialog-flyout .5s forwards;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-content, .panel {
+    -webkit-animation: ngdialog-flyin .5s;
+    animation: ngdialog-flyin .5s;
+    background-color: #f0f0f0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 35%;
+    margin-left: -17%;
+    margin-top: -10%;
+    padding: 10px;
+    border: 2px solid #333;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-close {
+  cursor: pointer;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-close:before {
+    background-image: url(../img/comicBg.png);
+    background-color: #FFE685;
+    background-blend-mode: multiply;
+    border-radius: 3px;
+    color: #B2A15D;
+    content: '\00D7';
+    font-size: 26px;
+    font-weight: 400;
+    height: 24px;
+    line-height: 22px;
+    position: absolute;
+    right: -5px;
+    text-align: center;
+    top: -5px;
+    border: 1px solid #B2A15D;
+    width: 24px;
+    border-radius: 25px;
+    background-size: 8px;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-close:hover:before,
+.ngdialog.ngdialog-theme-default .ngdialog-close:active:before {
+  color: #807342;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-message, .panel .body {
+    border: 2px solid #333;
+    padding: 10px;
+    background-image: url('../img/comicBg.png');
+    background-blend-mode: multiply;
+    background-size: 10px;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-buttons {
+  *zoom: 1;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-buttons:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-button {
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  float: right;
+  font-family: inherit;
+  font-size: .8em;
+  letter-spacing: .1em;
+  line-height: 1em;
+  margin: 0 0 0 .5em;
+  padding: .75em 2em;
+  text-transform: uppercase;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-button:focus {
+  -webkit-animation: ngdialog-pulse 1.1s infinite;
+  animation: ngdialog-pulse 1.1s infinite;
+  outline: none;
+}
+
+@media (max-width: 568px) {
+  .ngdialog.ngdialog-theme-default .ngdialog-button:focus {
+    -webkit-animation: none;
+    animation: none;
+  }
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-button.ngdialog-button-primary {
+  background: #3288e6;
+  color: #fff;
+}
+
+.ngdialog.ngdialog-theme-default .ngdialog-button.ngdialog-button-secondary {
+  background: #e0e0e0;
+  color: #777;
+}
+
+@media screen and (max-width: 645px) {
+    .wrapper {
+        width: 326px;
+    }
+
+    header {
+        height: 365px;
+        background-size: 100% 365px;
+    }
+
+    nav ul li {
+        margin: 0 35px 5px 35px;
+    }
+
+    .navbar-right {
+        float: none;
+        margin-left: 5px;
+    }
+
+    .col-md-1 {
+        width: 301px !important;
+    }
+
+    .btn {
+        margin-bottom: 5px;
+    }
+
+    .ngdialog.ngdialog-theme-default .ngdialog-content, .panel {
+        min-width: 326px;
+        width: 100%;
+        left: 0;
+        margin-left: 0;
+    }
+}
+
+@media screen and (min-width: 645px) and (max-width: 960px) {
+    .wrapper {
+        width: 645px;
+    }
+
+    header {
+        height: 250px;
+        background-size: 100% 250px;
+    }
+
+    .navbar-right {
+        margin-top: 10px;
+        margin-right: 45px;
+    }
+
+    .col-md-1 {
+        width: 620px !important;
+    }
+
+    .col-md-3.bigger {
+        width: 620px !important;
+    }
 }

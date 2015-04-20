@@ -260,7 +260,8 @@ var THREE = {
         "setFromMatrixPosition": function() {},
         "multiply": function() {},
         "normalize": function() {},
-        "applyAxisAngle": function() {}
+        "applyAxisAngle": function() {},
+        "setComponent": function() {}
     },
     "Vector4": function () {},
     "Euler": {
