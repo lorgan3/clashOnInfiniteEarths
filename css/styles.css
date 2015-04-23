@@ -229,7 +229,6 @@ header {
 
 .col-md-1 {
     width: 934px;
-    height: 100px;
 }
 
 .form-group label {
@@ -357,7 +356,7 @@ small {
 }
 
 .ngdialog.ngdialog-theme-default .ngdialog-close:before {
-    background-image: url(../img/comicBg.png);
+    background-image: url('../img/comicBg.png');
     background-color: #FFE685;
     background-blend-mode: multiply;
     border-radius: 3px;
@@ -437,6 +436,23 @@ small {
   color: #777;
 }
 
+.carousel {
+    width: 930px;
+    height: 300px;
+}
+
+.carousel li {
+    background-image: url('http://placehold.it/930x300/ff0000/ffffff');
+    border-left: 2px solid #333;
+    border-right: 2px solid #333;
+    margin-left: -1px !important;
+    background-repeat: no-repeat;
+}
+
+.no-padding {
+    padding: 0;
+}
+
 @media screen and (max-width: 645px) {
     .wrapper {
         width: 326px;
@@ -456,8 +472,21 @@ small {
         margin-left: 5px;
     }
 
+    .navbar-right > button {
+        margin-left: 50px;
+    }
+
     .col-md-1 {
         width: 301px !important;
+    }
+
+    .carousel {
+        width: 297px;
+        height: 143px;
+    }
+    .carousel li {
+        background-size: 150%;
+        background-position: -76px 0px;
     }
 
     .btn {
@@ -490,6 +519,16 @@ small {
     .col-md-1 {
         width: 620px !important;
     }
+
+    .carousel {
+        width: 616px;
+        height: 248px;
+    }
+    .carousel li {
+        background-size: 125%;
+        background-position: -77px 0px;
+    }
+
 
     .col-md-3.bigger {
         width: 620px !important;

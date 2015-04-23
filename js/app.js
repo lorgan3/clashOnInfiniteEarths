@@ -1,4 +1,4 @@
-var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog'])
+var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angular-carousel'])
 
 .run(function($rootScope, ngDialog, Players) {
     $rootScope.user = undefined;
