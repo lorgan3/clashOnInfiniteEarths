@@ -14,12 +14,14 @@ l3.objects.StateMachine = function(model) {
 
 /**
  * Adds a state to the statemachine.
- * @param {string}   name     The state's name.
- * @param {number}   group    The group to which this state belongs to.
- * @param {Function} callback The callback when the state gets selected.
+ * @param {string}                   name     The state's name.
+ * @param {number}                   group    The group to which this state belongs to.
+ * @param {Function}                 callback The callback when the state gets selected.
+ * @return {l3.objects.StateMachine}          The statemachine for easy chaining.
  */
 l3.objects.StateMachine.prototype.addState = function(name, group, callback) {
 	this.states[name] = {group: group, callback: callback};
+	return this;
 };
 
 /**

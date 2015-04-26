@@ -92,7 +92,6 @@ l3.main.Networking.prototype.addListeners = function(connection) {
 
             var player = players[index+1];
             objectHandler.remove(player);
-            player.destroy();
 
             self.broadcast({'a': l3.main.Networking.States.PLAYER_LEAVE, 'i': index+1});
             var j = 1;
@@ -143,7 +142,6 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                     var player = players[data['i']];
                     var myPlayer = players[myself];
                     objectHandler.remove(player);
-                    player.destroy();
                     myself = players.indexOf(myPlayer);
                 break;
                 case l3.main.Networking.States.RESET:

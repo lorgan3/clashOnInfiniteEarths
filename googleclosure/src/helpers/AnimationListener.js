@@ -31,12 +31,14 @@ l3.helpers.AnimationListener.prototype.update = function() {
 
 /**
  * Listen for a new animation event.
- * @param  {Object}   animation The animation.
- * @param  {number}   time      Threshold time.
- * @param  {Function} callback  The callback that runs when the animation passed the treshold.
+ * @param  {Object}                       animation The animation.
+ * @param  {number}                       time      Threshold time.
+ * @param  {Function}                     callback  The callback that runs when the animation passed the treshold.
+ * @return {l3.helpers.AnimationListener}           The listener for easy chaining.
  */
 l3.helpers.AnimationListener.prototype.on = function(animation, time, callback) {
     this.timedAnimations.push({a: animation, t: time, c: callback});
+    return this;
 }
 
 /**

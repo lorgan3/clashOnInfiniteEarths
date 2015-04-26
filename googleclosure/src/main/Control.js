@@ -17,8 +17,8 @@ l3.main.Control = function(game) {
 
     // HTML5 Pointer lock api to turn in normal devices.
     game.addEventListener('mousemove', function(e) {
-        self.pointerX +=  (e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0) % 5;
-        self.pointerY += (e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0) % 5;
+        self.pointerX +=  (e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0) % 50;
+        self.pointerY += (e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0) % 50;
     });
 
     // HTML5 device orientation to turn in mobile devices.
@@ -127,4 +127,5 @@ l3.main.Control.prototype.update = function() {
 
     // The rotation is set when the game sends a quick update.
     players[myself].move = this.clicks[l3.main.Control.Mouse.LEFT];
+    players[myself].attack = this.clicks[l3.main.Control.Mouse.RIGHT];
 };

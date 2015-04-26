@@ -16,12 +16,29 @@ l3.init.PlayerFactory.Wizard = function(position) {
     model.canMove = true;
     model.canTurn = true;
 
+    // play the flying animation
     model.animations[0].loop = true;
-    model.animations[0].play();
+    model.animations[1].loop = true;
+    model.animations[0].play(0, 0.01);
 
     // animationstates
     var stateMachine = new l3.objects.StateMachine(model);
     var player = new l3.objects.Player(model, stateMachine, {maxHp: 200});
+
+    stateMachine.addState('punch', 0, function(e) {
+        model.animations[2].play();
+        animationListener.on(model.animations[2], 0.3, function(e) {
+            var targets = collisionHelper.hit(player.worldposition, 2, player);
+            if (targets[0] !== undefined) {
+                targets[0].stateMachine.triggerState('getHit');
+            }
+        }).onEnd(model.animations[2], function(e) {
+            stateMachine.stopState('punch');
+        });
+    }).addState('getHit', 1, function(e) {
+        model.animations[1].play();
+    });
+
     objectHandler.add(player);
     player.reticle = new THREE.Mesh(new THREE.SphereGeometry(0.3, 2, 2), new THREE.MeshBasicMaterial({ color: 0xff0000, 'wireframe': true }));
     scene2.add(player.reticle);

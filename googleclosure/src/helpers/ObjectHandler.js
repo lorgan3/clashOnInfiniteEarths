@@ -45,6 +45,8 @@ l3.helpers.ObjectHandler.prototype.remove = function(object) {
     } else if (object instanceof l3.objects.Astroid) {
         astroids.splice(astroids.indexOf(object), 1);
     }
+
+    object.destroy();
 };
 
 /**
@@ -60,6 +62,7 @@ l3.helpers.ObjectHandler.prototype.removeAt = function(index) {
     }
 
     this.objects.splice(index, 1);
+    object.destroy();
 };
 
 /**
@@ -71,7 +74,7 @@ l3.helpers.ObjectHandler.prototype.update = function(delta) {
         var obj = this.objects[i];
         obj.update(delta);
 
-        if (this.firstFrame === false) {
+        /*if (this.firstFrame === false) {
             // Check for collisions
             for(var j in this.objects) {
                 if (i === j) {
@@ -83,7 +86,7 @@ l3.helpers.ObjectHandler.prototype.update = function(delta) {
                     break;
                 }
             }
-        }
+        }*/
     }
     this.firstFrame = false;
 };
