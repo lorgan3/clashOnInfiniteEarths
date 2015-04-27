@@ -1,3 +1,7 @@
+var Audio = {
+    "play": function() {}
+}
+
 var Stats = {
     "domElement" : {},
     "setMode" : function () {}
@@ -314,7 +318,8 @@ var THREE = {
             "bones": {}
         },
         "up": {},
-        "matrix": {}
+        "matrix": {},
+        "getWorldPosition": function() {}
     },
     "Object3DIdCount": {},
     "Face3": function () {},

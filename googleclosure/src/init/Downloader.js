@@ -26,6 +26,9 @@ l3.init.Downloader.prototype.init = function() {
 	this.loadImage('planetSkin', 'img/planet.png');
 	this.loadImage('hero1Skin', 'img/hero1.png');
 
+	this.loadSound('punch', 'snd/punch.mp3');
+	this.loadSound('swing', 'snd/swing.mp3');
+
 	this.loadMesh('wizard', 'models/hero1.json');
 	this.loadMesh('planet', 'models/planet.json');
 };
@@ -57,6 +60,15 @@ l3.init.Downloader.prototype.loadMesh = function(name, url) {
  */
 l3.init.Downloader.prototype.loadImage = function(name, url) {
 	this.models[name] = THREE.ImageUtils.loadTexture(url);
+};
+
+/**
+ * Download a sound.
+ * @param  {string} name The key to get the downloaded sound later.
+ * @param  {string} url  path to download from.
+ */
+l3.init.Downloader.prototype.loadSound = function(name, url) {
+	this.models[name] = new Audio(url);
 };
 
 /**
