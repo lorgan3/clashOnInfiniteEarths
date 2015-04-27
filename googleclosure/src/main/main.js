@@ -13,6 +13,7 @@ goog.require('l3.helpers.CollisionHelper');
 goog.require('l3.html.Panel');
 goog.require('l3.objects.Astroid');
 goog.require('l3.helpers.PointerLockHelper');
+goog.require('l3.objects.Laser');
 
 var stats, world;
 var players = [];
@@ -24,7 +25,7 @@ var astroids = [];
  * @const
  * @type {boolean}
  */
-var debug = false;
+var debug = true;
 
 /**
  * A number that indicates which character in the Players array that you control.
@@ -51,6 +52,7 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     scene = new THREE.Scene();
     scene2 = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    console.log(camera);
 
     // Various objects to help with the game.
     panel = new l3.html.Panel(document.getElementById('container'));
@@ -69,7 +71,9 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
         // The world everything revolves around.
         world = downloader.addClone('planet', new THREE.Vector3(0, 0, 0), new THREE.Euler(0, Math.PI/2, 0, 'XYZ'));
         world.material.materials[0].map = downloader.get('planetSkin');
+        world.orbit = 22;
         scene.add(world);
+        cameraHelper.setUp();
 
         // Draw the world's x, y and z axis in debug mode.
         if (debug === true) {
@@ -87,24 +91,10 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
         }
 
         if (networker.isHost === true || networker.token === undefined) {
-            var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
-
-            // Randomize
-            player.pivot2.rotation.x = Math.random() * Math.PI * 2;
-            player.pivot2.rotation.y = Math.random() * Math.PI * 2;
-            player.pivot2.rotation.z = Math.random() * Math.PI * 2;
-
-            myself = 0;
-            cameraHelper.setUp();
-
-            //for(var i=0; i<20; i++) {
-                var astroid = l3.init.PlayerFactory.Astroid(new THREE.Vector3(0, 0, 22));
-
-                astroid.pivot2.rotation.x = Math.random() * Math.PI * 2;
-                astroid.pivot2.rotation.y = Math.random() * Math.PI * 2;
-                astroid.pivot2.rotation.z = Math.random() * Math.PI * 2;
-            //}
-       }
+            document.addEventListener('keypress', function(e) {
+                gameStart();
+            });
+        }
 
        //particleHandler.add({ 'amount': 100, 'directions': new THREE.Vector3(0.3, 0.3, 0.01), 'size': 5, 'map': downloader.get('particle'), 'color': 0xff0000, 'emit': 4, 'position': new THREE.Vector3(0, 0, 10.5) });
     };
@@ -191,4 +181,46 @@ function initStats() {
     stats.setMode(0); // 0: fps, 1: ms
 
     document.body.appendChild(stats.domElement);
+}
+
+/**
+ * Spawns a hero for each player. This assumes no players exist at the time this function runs.
+ */
+function gameStart() {
+    // The host
+    l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
+    myself = 0;
+    cameraHelper.setUp();
+
+    // Clients
+    for (var i in networker.peers) {
+        var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
+        player.pivot2.rotation.x = (i+1)/(networker.peers.length+1) * Math.PI * 2;
+    }
+
+    // Tell the clients.
+    for (var i in networker.peers) {
+        networker.sendFullUpdate(networker.peers[i]);
+    }
+}
+
+/**
+ * Removes all objects from the game.
+ */
+function gameEnd() {
+    for (var i=objectHandler.objects.length-1; i>=0; i--) {
+        objectHandler.removeAt(i);
+    }
+
+    for (var i in particleHandler.system.children) {
+        particleHandler.system.children[i].system.remove();
+    }
+
+    myself = undefined;
+    cameraHelper.setUp();
+
+    // Also tell the clients
+    if (networker.isHost === true) {
+        networker.broadcast({'a': l3.main.Networking.States.RESET});
+    }
 }

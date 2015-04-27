@@ -31,14 +31,10 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
 
         this.peer.on('connection', function(other) {
             other.on('open', function() {
-                self.broadcast({'a': l3.main.Networking.States.PLAYER_JOIN, 'n': 'playerX', 'c': 1});
                 self.addListeners(other);
                 self.peers.push(other);
                 other.peerId = self.peers.length;
-
-                var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
                 this.sendFullUpdate(other);
-                console.log('opened');
             });
         });
     } else if (token !== undefined) {
@@ -71,8 +67,8 @@ l3.main.Networking.States = {
     FULL: 1,
     STATE: 2,
     QUICK: 3,
-    PLAYER_JOIN: 4,
-    PLAYER_LEAVE: 5,
+    PLAYER_SPAWN: 4,
+    PLAYER_DIE: 5,
     RESET: 6
 };
 
@@ -85,7 +81,6 @@ l3.main.Networking.prototype.addListeners = function(connection) {
 
     connection.on('close', function() {
         if (self.isHost === true) {
-            console.log('closed');
             var index = self.peers.indexOf(connection);
             self.peers.splice(index, 1);
             connection.close();
@@ -93,7 +88,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
             var player = players[index+1];
             objectHandler.remove(player);
 
-            self.broadcast({'a': l3.main.Networking.States.PLAYER_LEAVE, 'i': index+1});
+            self.broadcast({'a': l3.main.Networking.States.PLAYER_DIE, 'i': index+1});
             var j = 1;
             for(var i in self.peers) {
                 self.peers[i].peerId = j;
@@ -131,32 +126,27 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 case l3.main.Networking.States.FULL:
                     this.receiveFullUpdate(data);
 
-                    myself = data['i'];
-                    cameraHelper.setUp();
+                    console.log(data['i']);
+                    if (players.length >= data['i']) {
+                        myself = data['i'];
+                        cameraHelper.setUp();
+                    }
                 break;
-                case l3.main.Networking.States.PLAYER_JOIN:
-                    var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
-                    player.name = data['n'];
+                case l3.main.Networking.States.PLAYER_SPAWN:
+                    var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
                 break;
-                case l3.main.Networking.States.PLAYER_LEAVE:
+                case l3.main.Networking.States.PLAYER_DIE:
                     var player = players[data['i']];
                     var myPlayer = players[myself];
                     objectHandler.remove(player);
                     myself = players.indexOf(myPlayer);
                 break;
                 case l3.main.Networking.States.RESET:
-                    this.clearLevel();
+                    gameEnd();
                 break;
             }
         }
     });
-};
-
-/**
- * Clears the level.
- */
-l3.main.Networking.prototype.clearLevel = function() {
-    // TODO
 };
 
 /**
@@ -181,13 +171,12 @@ l3.main.Networking.prototype.sendFullUpdate = function(peer) {
  */
 l3.main.Networking.prototype.receiveFullUpdate = function(data) {
     for (var i=0; i<data['p']; i++) {
-        l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, 20.5));
+        l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
     }
 
     for (var i=0; i<data['b']; i++) {
-        l3.init.PlayerFactory.Astroid(new THREE.Vector3(0, 0, 22));
+        l3.init.PlayerFactory.Astroid(new THREE.Vector3(0, 0, world.orbit));
     }
-
 
     var j = 0;
     for (var i in players) {

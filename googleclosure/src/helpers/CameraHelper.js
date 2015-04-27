@@ -29,7 +29,7 @@ l3.helpers.CameraHelper.prototype.setUp = function() {
 
     if (myself === undefined || myself < 0) {
         this.target = world;
-        this.camera.position.set(0, 0, 100);
+        this.camera.position.set(0, 0, 60);
         this.camera.lookAt(world.position);
         this.target.add(this.camera);
     } else {
