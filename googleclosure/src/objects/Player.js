@@ -103,7 +103,8 @@ l3.objects.Player.prototype.deserialize = function(data) {
  */
 l3.objects.Player.prototype.serializeState = function() {
     return { 'm': this.move,
-             'x': this.rotation
+             'x': this.rotation,
+             'a': this.attack
            };
 };
 
@@ -114,6 +115,7 @@ l3.objects.Player.prototype.serializeState = function() {
 l3.objects.Player.prototype.deserializeState = function(data) {
     this.move = data['m'];
     this.rotation = data['x'];
+    this.attack = data['a'];
 };
 
 /** @inheritDoc */

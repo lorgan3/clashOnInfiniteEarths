@@ -126,8 +126,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 case l3.main.Networking.States.FULL:
                     this.receiveFullUpdate(data);
 
-                    console.log(data['i']);
-                    if (players.length >= data['i']) {
+                    if (players.length > data['i']) {
                         myself = data['i'];
                         cameraHelper.setUp();
                     }
