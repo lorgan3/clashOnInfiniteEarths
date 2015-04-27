@@ -27,6 +27,12 @@ l3.helpers.ParticleHandler.prototype.add = function(options) {
 l3.helpers.ParticleHandler.prototype.update = function() {
     for(var i in this.system.children) {
         var system = this.system.children[i];
+        if (system.lifetime > 0) {
+            system.lifetime--;
+            if (system.lifetime === 0) {
+                system.system.remove();
+            }
+        }
         if (system.active === false) {
             continue;
         }

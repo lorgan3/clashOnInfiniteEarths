@@ -31,6 +31,18 @@ l3.helpers.ParticleSystem = function(options) {
     var map = options['map'];
 
     /**
+     * Opactiy of the particles.
+     * @type {number|undefined}
+     */
+    var opactiy = options['opacity'] || 1;
+
+    /**
+     * The kind of blending that should be used.
+     * @type {number}
+     */
+    var blending = options['blending'] || THREE.AdditiveBlending;
+
+    /**
      * The color of the particles.
      * @type {number}
      */
@@ -42,7 +54,7 @@ l3.helpers.ParticleSystem = function(options) {
         geometry.vertices[i].drift = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).multiply(directions);
     }
 
-    this.cloud = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({ 'size': size, 'color': color, 'blending': THREE.AdditiveBlending, 'transparent': true, 'map': map }));
+    this.cloud = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({ 'size': size, 'color': color, 'blending': blending, 'transparent': true, 'opacity': opactiy, 'map': map }));
     this.cloud.offset = 0;
     this.cloud.directions = directions;
 
@@ -51,6 +63,12 @@ l3.helpers.ParticleSystem = function(options) {
      * @type {number}
      */
     this.cloud.emit = options['emit'] || 0;
+
+    /**
+     * The lifetime of the system (set to 0 for infinite)
+     * @type {number}
+     */
+    this.cloud.lifetime = options['lifetime'] || 0;
 
     /**
      * The position of the particle system (for emitting)

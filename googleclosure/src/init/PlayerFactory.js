@@ -28,9 +28,10 @@ l3.init.PlayerFactory.Wizard = function(position) {
     stateMachine.addState('punch', 0, function(e) {
         model.animations[2].play();
         animationListener.on(model.animations[2], 0.3, function(e) {
-            var targets = collisionHelper.hit(player.worldposition, 2, player);
-            if (targets[0] !== undefined) {
-                targets[0].stateMachine.triggerState('getHit');
+            var target = collisionHelper.hit(player.worldposition, 2, player)[0];
+            if (target !== undefined) {
+                target.stateMachine.triggerState('getHit');
+                particleHandler.add({ 'amount': 1, 'directions': new THREE.Vector3(0, 0, 0), 'size': 50, 'map': downloader.get('pow'), 'lifetime': 60, 'blending': THREE.NormalBlending }).spawn(target.worldposition);
             }
         }).onEnd(model.animations[2], function(e) {
             stateMachine.stopState('punch');

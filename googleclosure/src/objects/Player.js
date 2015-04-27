@@ -33,6 +33,12 @@ l3.objects.Player = function(model, stateMachine, options) {
     this.move = false;
 
     /**
+     * Is the player attacking?
+     * @type {boolean}
+     */
+    this.attack = false;
+
+    /**
      * A value that determines how much the orbit changes.
      * @type {number}
      */
@@ -129,13 +135,18 @@ l3.objects.Player.prototype.update = function(delta) {
 
     // Change orbit.
     if (this.rotation !== 0) {
-        this.rotation = Math.max(-15, Math.min(15, this.rotation));
-        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), this.rotation * delta * 0.1);
+        this.rotation = Math.max(-3, Math.min(3, this.rotation));
+        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), this.rotation * delta * 0.5);
     }
 
     // Speed up.
     if (this.move === true) {
         this.speed = Math.min(1, this.speed + 2 * delta);
+    }
+
+    if (this.attack === true) {
+        this.attack = false;
+        this.stateMachine.triggerState('punch');
     }
 };
 
