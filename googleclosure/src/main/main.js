@@ -15,17 +15,25 @@ goog.require('l3.objects.Astroid');
 goog.require('l3.helpers.PointerLockHelper');
 goog.require('l3.objects.Laser');
 
-var stats, world;
-var players = [];
-var astroids = [];
-
 /**
  * Show debug information?
  *
  * @const
  * @type {boolean}
  */
-var debug = true;
+var debug = false;
+
+/**
+ * An array that contains all playable characters.
+ * @type {Array.<l3.objects.BaseObject>}
+ */
+var players = [];
+
+/**
+ * An array that contains all other objects that should be synchronized.
+ * @type {Array.<l3.objects.BaseObject>}
+ */
+var astroids = [];
 
 /**
  * A number that indicates which character in the Players array that you control.
@@ -33,7 +41,21 @@ var debug = true;
  */
 var myself = undefined;
 
-var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panel,
+/**
+ * The amount by which the particles need to be resized depending on what view the camera is currently in.
+ * @type {number}
+ */
+var particleFactor = 0.3;
+
+/**
+ * The planet which everything revolves around.
+ * This object should also contain an orbit value.
+ * @type {Object}
+ */
+var world;
+
+// Extra global variables.
+var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panel, stats,
     networker, downloader, collisionHelper, pointerLockHelper, control, webGLRenderer, spotLight, light, clock;
 
 /**
@@ -52,7 +74,6 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
     scene = new THREE.Scene();
     scene2 = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    console.log(camera);
 
     // Various objects to help with the game.
     panel = new l3.html.Panel(document.getElementById('container'));
@@ -73,6 +94,12 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
         world.material.materials[0].map = downloader.get('planetSkin');
         world.orbit = 22;
         scene.add(world);
+        var geometry = new THREE.Geometry();
+        for (var i=0; i<200; i++) {
+            geometry.vertices[i] = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize().multiplyScalar(50);
+        }
+        var stars = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({ 'size': 10 * particleFactor, 'blending': THREE.AdditiveBlending, 'transparent': true, 'color': 0xffffff,  'map': downloader.get('particle') }));
+        world.add(stars);
         cameraHelper.setUp();
 
         // Draw the world's x, y and z axis in debug mode.
@@ -101,7 +128,7 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
 
     // create a render and set the size
     webGLRenderer = new THREE.WebGLRenderer();
-    webGLRenderer.setClearColor(new THREE.Color(0x999999, 1.0));
+    //webGLRenderer.setClearColor(new THREE.Color(0x999999, 1.0));
     webGLRenderer.setSize(window.innerWidth, window.innerHeight);
     webGLRenderer.shadowMapEnabled = false;
     webGLRenderer.autoClear = false;
@@ -191,6 +218,8 @@ function gameStart() {
     l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
     myself = 0;
     cameraHelper.setUp();
+
+    l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
 
     // Clients
     for (var i in networker.peers) {
