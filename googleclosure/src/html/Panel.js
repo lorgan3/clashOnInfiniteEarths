@@ -15,6 +15,8 @@ l3.html.Panel = function(container) {
     this.panel.id = 'game-panel';
     this.panel.style.display = 'none';
 
+    this.panel.wrapper = document.createElement('div');
+    this.panel.wrapper.className = 'body';
     this.panel.head = document.createElement('div');
     this.panel.head.className = 'panel-heading';
     this.panel.headTitle = document.createElement('h3');
@@ -37,9 +39,10 @@ l3.html.Panel = function(container) {
     this.panel.body.appendChild(this.panel.message);
     this.panel.body.appendChild(this.panel.progress);
     this.panel.head.appendChild(this.panel.headTitle);
-    this.panel.appendChild(this.panel.head);
-    this.panel.appendChild(this.panel.body);
-    this.panel.appendChild(this.panel.backButton);
+    this.panel.wrapper.appendChild(this.panel.head);
+    this.panel.wrapper.appendChild(this.panel.body);
+    this.panel.wrapper.appendChild(this.panel.backButton);
+    this.panel.appendChild(this.panel.wrapper);
 
     container.appendChild(this.panel);
 
