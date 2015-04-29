@@ -272,7 +272,20 @@ small {
 
 .list-group-item:not(:last-child) {
     box-shadow: 0 12px 15px -10px #aaa;
-    padding: 5px 0;
+}
+
+.list-group-item {
+    display: block;
+    text-decoration: none;
+    color: #333;
+    margin: 3px;
+    padding: 7px;
+    transition: background 0.4s;
+}
+
+.list-group-item:hover:not(.disabled) {
+    background: #ccc;
+    border-radius: 10px;
 }
 
 @-webkit-keyframes ngdialog-flyin {

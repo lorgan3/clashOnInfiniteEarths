@@ -11,6 +11,7 @@ goog.require('l3.init.Downloader');
 goog.require('l3.init.PlayerFactory');
 goog.require('l3.helpers.CollisionHelper');
 goog.require('l3.html.Panel');
+goog.require('l3.html.ClassSelect');
 goog.require('l3.objects.Astroid');
 goog.require('l3.helpers.PointerLockHelper');
 goog.require('l3.objects.Laser');
@@ -55,7 +56,7 @@ var particleFactor = 0.3;
 var world;
 
 // Extra global variables.
-var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panel, stats,
+var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panel, stats, classSelect,
     networker, downloader, collisionHelper, pointerLockHelper, control, webGLRenderer, spotLight, light, clock;
 
 /**
@@ -77,6 +78,7 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
 
     // Various objects to help with the game.
     panel = new l3.html.Panel(document.getElementById('container'));
+    classSelect = new l3.html.ClassSelect(document.getElementById('container'));
     animationListener = new l3.helpers.AnimationListener();
     objectHandler = new l3.helpers.ObjectHandler();
     cameraHelper = new l3.helpers.CameraHelper(camera);
@@ -118,12 +120,8 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
         }
 
         if (networker.isHost === true || networker.token === undefined) {
-            document.addEventListener('keypress', function(e) {
-                gameStart();
-            });
+            classSelect.show();
         }
-
-       //particleHandler.add({ 'amount': 100, 'directions': new THREE.Vector3(0.3, 0.3, 0.01), 'size': 5, 'map': downloader.get('particle'), 'color': 0xff0000, 'emit': 4, 'position': new THREE.Vector3(0, 0, 10.5) });
     };
 
     // create a render and set the size
@@ -179,10 +177,12 @@ function render() {
         animationListener.update();
 
         totalDelta += delta;
-        if (totalDelta >= 0.05 && myself !== undefined) {
+        if (totalDelta >= 0.04 && myself !== undefined) {
             totalDelta = 0;
             players[myself].rotation = control.pointerX;
-            control.pointerX = 0;
+            if (pointerLockHelper.locked === true) {
+                control.pointerX = 0;
+            }
             networker.serializeState();
         }
 

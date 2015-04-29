@@ -17,8 +17,14 @@ l3.main.Control = function(game) {
 
     // HTML5 Pointer lock api to turn in normal devices.
     game.addEventListener('mousemove', function(e) {
-        self.pointerX +=  (e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0) % 50;
-        self.pointerY += (e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0) % 50;
+        if (pointerLockHelper.locked === false) {
+            // Fallback
+            self.pointerX = (e.screenX - window.innerWidth/2)/80;
+            self.pointerY = (e.screenY - window.innerHeight/2)/80;
+        } else {
+            self.pointerX +=  (e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0) % 50;
+            self.pointerY += (e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0) % 50;
+        }
     });
 
     // HTML5 device orientation to turn in mobile devices.
@@ -104,6 +110,21 @@ l3.main.Control = function(game) {
     // Prevent the right click context menu.
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.keyCode === 9) {
+            classSelect.show();
+
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+        }
+    });
+    document.addEventListener('keyup', function(e) {
+        if (e.keyCode === 9) {
+            classSelect.hide();
+        }
     });
 };
 

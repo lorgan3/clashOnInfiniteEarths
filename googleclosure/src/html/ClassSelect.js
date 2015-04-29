@@ -22,20 +22,16 @@ l3.html.ClassSelect = function(container) {
     this.panel.body = document.createElement('div');
     this.panel.body.className = 'panel-body';
     this.panel.message = document.createElement('div');
-    this.panel.progress = document.createElement('div');
-    this.panel.progress.className = 'progress';
-    this.panel.progressBar = document.createElement('div');
-    this.panel.progressBar.className = 'progress-bar progress-bar-striped active'
-    this.panel.progressBar.style.width = '0%';
     this.panel.backButton = document.createElement('a');
     this.panel.backButton.className = 'btn btn-default';
-    this.panel.backButton.href = '#/';
-    this.panel.backButton.textContent = 'Leave game';
-    this.panel.backButton.style.display = 'none';
+    this.panel.backButton.onclick = function() {
+        gameStart();
+        classSelect.hide();
+    };
+    this.panel.backButton.textContent = 'start game';
+    this.panel.backButton.style.display = 'inline-block';
 
-    this.panel.progress.appendChild(this.panel.progressBar);
     this.panel.body.appendChild(this.panel.message);
-    this.panel.body.appendChild(this.panel.progress);
     this.panel.head.appendChild(this.panel.headTitle);
     this.panel.appendChild(this.panel.head);
     this.panel.appendChild(this.panel.body);
