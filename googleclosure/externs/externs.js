@@ -319,7 +319,8 @@ var THREE = {
         },
         "up": {},
         "matrix": {},
-        "getWorldPosition": function() {}
+        "getWorldPosition": function() {},
+        "updateMatrix": function() {}
     },
     "Object3DIdCount": {},
     "Face3": function () {},

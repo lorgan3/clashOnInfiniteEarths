@@ -34,7 +34,7 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
                 self.addListeners(other);
                 self.peers.push(other);
                 other.peerId = self.peers.length;
-                this.sendFullUpdate(other);
+                self.sendFullUpdate(other);
             });
         });
     } else if (token !== undefined) {
@@ -69,7 +69,8 @@ l3.main.Networking.States = {
     QUICK: 3,
     PLAYER_SPAWN: 4,
     PLAYER_DIE: 5,
-    RESET: 6
+    RESET: 6,
+    HELLO: 7
 };
 
 /**
@@ -124,7 +125,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                     self.receiveQuickUpdate(data['d']);
                 break;
                 case l3.main.Networking.States.FULL:
-                    this.receiveFullUpdate(data);
+                    self.receiveFullUpdate(data);
 
                     if (players.length > data['i']) {
                         myself = data['i'];

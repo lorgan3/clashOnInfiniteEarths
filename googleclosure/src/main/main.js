@@ -219,12 +219,13 @@ function gameStart() {
     myself = 0;
     cameraHelper.setUp();
 
-    l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
+    //l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
 
     // Clients
     for (var i in networker.peers) {
         var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
         player.pivot2.rotation.x = (i+1)/(networker.peers.length+1) * Math.PI * 2;
+        player.pivot2.updateMatrix();
     }
 
     // Tell the clients.

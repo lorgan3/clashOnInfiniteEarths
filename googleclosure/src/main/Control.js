@@ -19,8 +19,8 @@ l3.main.Control = function(game) {
     game.addEventListener('mousemove', function(e) {
         if (pointerLockHelper.locked === false) {
             // Fallback
-            self.pointerX = (e.screenX - window.innerWidth/2)/80;
-            self.pointerY = (e.screenY - window.innerHeight/2)/80;
+            self.pointerX = (e.pageX - window.innerWidth/2)/80;
+            self.pointerY = (e.pageY - window.innerHeight/2)/80;
         } else {
             self.pointerX +=  (e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0) % 50;
             self.pointerY += (e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0) % 50;

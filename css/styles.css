@@ -288,6 +288,30 @@ small {
     border-radius: 10px;
 }
 
+.player-table {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+.player-table tr {
+    height: 25px;
+    line-height: 25px;
+}
+
+.player-table tr:nth-child(even) {
+    background: #f5f5f5;
+}
+
+.player-table tr th {
+    text-align: left;
+}
+
+.player-table tr td:first-child, .player-table tr th:first-child {
+    width: 60%;
+}
+
 @-webkit-keyframes ngdialog-flyin {
   0% {
     opacity: 0;

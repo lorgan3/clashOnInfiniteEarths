@@ -41,9 +41,9 @@ l3.helpers.PointerLockHelper.prototype.unlock = function() {
  */
 l3.helpers.PointerLockHelper.prototype.lockChange = function() {
     var element = document['pointerLockElement'] || document['mozPointerLockElement'] || document['webkitPointerLockElement'];
-    if (element === this.element) {
-        this.locked = true;
+    if (element === pointerLockHelper.element) {
+        pointerLockHelper.locked = true;
     } else {
-        this.locked = false;
+        pointerLockHelper.locked = false;
     }
 };
