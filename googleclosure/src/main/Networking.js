@@ -3,14 +3,15 @@ goog.provide('l3.main.Networking');
 /**
  * Handler for networking.
  *
- * @param  {boolean}  isHost         Are you the host?
- * @param  {string=}  token          The peer token.
- * @param  {number=}  maxplayers     The maximum amount of players.
- * @param  {string=}  peerserver     The peerserver hostname.
- * @param  {number=}  peerserverport The peerserver port.
+ * @param {boolean}  isHost         Are you the host?
+ * @param {string=}  token          The peer token.
+ * @param {number=}  maxplayers     The maximum amount of players.
+ * @param {string=}  peerserver     The peerserver hostname.
+ * @param {number=}  peerserverport The peerserver port.
+ * @param {string=}  playerName     The name of the player.
  * @constructor
  */
-l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverport) {
+l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverport, playerName) {
     this.connection = undefined;
     this.isHost = isHost;
     this.peer = undefined;
@@ -28,12 +29,16 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
     if (isHost === true) {
         var self = this;
         this.peer = new Peer(token, options);
+        this.connected = true;
 
         this.peer.on('connection', function(other) {
             other.on('open', function() {
                 self.addListeners(other);
                 self.peers.push(other);
                 other.peerId = self.peers.length;
+                other.name = 'Player';
+                other.kills = 0;
+                other.deaths = 0;
                 self.sendFullUpdate(other);
             });
         });
@@ -57,6 +62,16 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
             }
         });
     }
+
+    if (this.peer !== undefined) {
+        this.peer.name = playerName;
+        this.peer.kills = 0;
+        this.peer.deaths = 0;
+        classSelect.addPlayer(this.peer);
+    } else {
+        // Single player
+        classSelect.addPlayer({name: playerName, kills: 0, deaths: 0});
+    }
 };
 
 /**
@@ -70,7 +85,8 @@ l3.main.Networking.States = {
     PLAYER_SPAWN: 4,
     PLAYER_DIE: 5,
     RESET: 6,
-    HELLO: 7
+    HELLO: 7,
+    PLAYERLIST: 8
 };
 
 /**
@@ -82,6 +98,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
 
     connection.on('close', function() {
         if (self.isHost === true) {
+            classSelect.removePlayer(connection);
             var index = self.peers.indexOf(connection);
             self.peers.splice(index, 1);
             connection.close();
@@ -107,24 +124,34 @@ l3.main.Networking.prototype.addListeners = function(connection) {
     connection.on('data', function(data) {
         if (self.connected === false) {
             self.connected = true;
+            self.connection.send({'a': l3.main.Networking.States.HELLO, 'n': self.peer.name});
             panel.hide();
         }
 
         if (self.isHost === true) {
             switch(data['a']) {
                 case l3.main.Networking.States.STATE:
+                    // Receive the input from the client.
                     self.deserializeState(data['d'], connection.peerId);
+                break;
+                case l3.main.Networking.States.HELLO:
+                    // Receive the name from the client.
+                    connection.name = data['n'];
+                    classSelect.addPlayer({name: connection.name, kills: connection.kills, deaths: connection.deaths});
                 break;
             }
         } else {
             switch(data['a']) {
                 case l3.main.Networking.States.STATE:
+                    // Receive all player's inputs.
                     self.deserializeState(data['d']);
                 break;
                 case l3.main.Networking.States.QUICK:
+                    // Receive the exact location, health, ...
                     self.receiveQuickUpdate(data['d']);
                 break;
                 case l3.main.Networking.States.FULL:
+                    // Receive all data to setup a game.
                     self.receiveFullUpdate(data);
 
                     if (players.length > data['i']) {
@@ -133,15 +160,18 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                     }
                 break;
                 case l3.main.Networking.States.PLAYER_SPAWN:
-                    var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
+                    // Spawn a player.
+                    l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
                 break;
                 case l3.main.Networking.States.PLAYER_DIE:
+                    // Remove a player.
                     var player = players[data['i']];
                     var myPlayer = players[myself];
                     objectHandler.remove(player);
                     myself = players.indexOf(myPlayer);
                 break;
                 case l3.main.Networking.States.RESET:
+                    // Stop the game.
                     gameEnd();
                 break;
             }

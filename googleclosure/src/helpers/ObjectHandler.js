@@ -38,15 +38,17 @@ l3.helpers.ObjectHandler.prototype.add = function(object) {
  * @param  {l3.objects.BaseObject} object The object that you want to remove.
  */
 l3.helpers.ObjectHandler.prototype.remove = function(object) {
-    this.objects.splice(this.objects.indexOf(object), 1);
+    var i = this.objects.indexOf(object);
+    if (i !== -1) {
+        this.objects.splice(i, 1);
+        if (object instanceof l3.objects.Player) {
+            players.splice(players.indexOf(object), 1);
+        } else if (object instanceof l3.objects.Astroid) {
+            astroids.splice(astroids.indexOf(object), 1);
+        }
 
-    if (object instanceof l3.objects.Player) {
-        players.splice(players.indexOf(object), 1);
-    } else if (object instanceof l3.objects.Astroid) {
-        astroids.splice(astroids.indexOf(object), 1);
+        object.destroy();
     }
-
-    object.destroy();
 };
 
 /**
@@ -55,14 +57,16 @@ l3.helpers.ObjectHandler.prototype.remove = function(object) {
  */
 l3.helpers.ObjectHandler.prototype.removeAt = function(index) {
     var object = this.objects[index];
-    if (object instanceof l3.objects.Player) {
-        players.splice(players.indexOf(object), 1);
-    } else if (object instanceof l3.objects.Astroid) {
-        astroids.splice(astroids.indexOf(object), 1);
-    }
+    if (object !== undefined) {
+        if (object instanceof l3.objects.Player) {
+            players.splice(players.indexOf(object), 1);
+        } else if (object instanceof l3.objects.Astroid) {
+            astroids.splice(astroids.indexOf(object), 1);
+        }
 
-    this.objects.splice(index, 1);
-    object.destroy();
+        this.objects.splice(index, 1);
+        object.destroy();
+    }
 };
 
 /**

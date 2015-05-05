@@ -66,8 +66,10 @@ var scene, camera, animationListener, particleHandler, objectHandler, cameraHelp
  * @param  {number=}  maxplayers     The maximum amount of players.
  * @param  {string=}  peerserver     The peerserver hostname.
  * @param  {number=}  peerserverport The peerserver port.
+ * @param  {string=}  serverName     The server name.
+ * @param  {string=}  playerName     The name of the player.
  */
-function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
+function startGame(isHost, token, maxplayers, peerserver, peerserverport, serverName, playerName) {
     game = document.getElementById('game');
     initStats();
 
@@ -78,11 +80,11 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport) {
 
     // Various objects to help with the game.
     panel = new l3.html.Panel(document.getElementById('container'));
-    classSelect = new l3.html.ClassSelect(document.getElementById('container'));
+    classSelect = new l3.html.ClassSelect(document.getElementById('container'), (isHost || token === undefined), serverName);
+    networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport, playerName);
     animationListener = new l3.helpers.AnimationListener();
     objectHandler = new l3.helpers.ObjectHandler();
     cameraHelper = new l3.helpers.CameraHelper(camera);
-    networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport);
     downloader = new l3.init.Downloader();
     collisionHelper = new l3.helpers.CollisionHelper(false);
     pointerLockHelper = new l3.helpers.PointerLockHelper();
@@ -254,3 +256,13 @@ function gameEnd() {
         networker.broadcast({'a': l3.main.Networking.States.RESET});
     }
 }
+
+/**
+ * Shows the class select menu.
+ */
+function showClassSelect() {
+    if (classSelect !== undefined) {
+        classSelect.show();
+    }
+}
+window['showClassSelect'] = showClassSelect;

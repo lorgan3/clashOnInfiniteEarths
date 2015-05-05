@@ -28,14 +28,19 @@ l3.init.PlayerFactory.Wizard = function(position) {
     stateMachine.addState('punch', 0, function(e) {
         model.animations[2].play();
         downloader.get('swing').play();
-        animationListener.on(model.animations[2], 0.3, function(e) {
+        var laser = l3.init.PlayerFactory.Laser(new THREE.Vector3(0, 0, world.orbit-1.5));
+        laser.pivot2.matrix.copy(player.pivot2.matrix);
+        laser.pivot2.rotation.setFromRotationMatrix(laser.pivot2.matrix);
+        laser.pivot.rotation.y = player.pivot.rotation.y+Math.PI/20;
+        laser.owner = player;
+        animationListener/*.on(model.animations[2], 0.3, function(e) {
             var target = collisionHelper.hit(player.worldposition, 2, player)[0];
             if (target !== undefined) {
                 //target.stateMachine.triggerState('getHit');
                 downloader.get('punch').play();
                 particleHandler.add({ 'amount': 1, 'directions': new THREE.Vector3(0, 0, 0), 'size': 50, 'map': downloader.get('pow'), 'lifetime': 60, 'blending': THREE.NormalBlending }).spawn(target.worldposition);
             }
-        }).onEnd(model.animations[2], function(e) {
+        })*/.onEnd(model.animations[2], function(e) {
             stateMachine.stopState('punch');
         });
     }).addState('getHit', 1, function(e) {
@@ -63,7 +68,7 @@ l3.init.PlayerFactory.Wizard = function(position) {
 /**
  * Sets up an astroid.
  * @param  {Object=}            position The position to place the astroid.
- * @return {l3.objects.Astroid}          The wizard.
+ * @return {l3.objects.Astroid}          The astroid.
  */
 l3.init.PlayerFactory.Astroid = function(position) {
     var model = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshLambertMaterial({ color: 0x965D2F }));
@@ -76,6 +81,24 @@ l3.init.PlayerFactory.Astroid = function(position) {
     scene.add(astroid.pivot2);
 
     return astroid;
+};
+
+/**
+ * Sets up a laser.
+ * @param  {Object=}            position The position to place the laser.
+ * @return {l3.objects.Laser}            The laser.
+ */
+l3.init.PlayerFactory.Laser = function(position) {
+    var model = downloader.addClone('laser', position, new THREE.Euler(0, 0, -Math.PI/2, 'XYZ'));
+    model.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+
+    var laser = new l3.objects.Laser(model);
+    objectHandler.add(laser);
+
+    // Add the laser's 2nd pivot to the scene rather than the model itself for the orbit to work.
+    scene.add(laser.pivot2);
+
+    return laser;
 };
 
 /**

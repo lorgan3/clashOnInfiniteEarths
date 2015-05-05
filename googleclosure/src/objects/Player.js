@@ -54,7 +54,7 @@ l3.objects.Player = function(model, stateMachine, options) {
      * The size of this object (used for collisionchecking)
      * @type {number}
      */
-    this.size = 2;
+    this.size = 1.4;
 
     // Set up pivots to aid with the orbit.
     this.pivot = new THREE.Object3D();

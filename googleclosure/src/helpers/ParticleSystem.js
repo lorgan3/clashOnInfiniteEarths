@@ -28,7 +28,7 @@ l3.helpers.ParticleSystem = function(options) {
      * Texture of the particles.
      * @type {string|undefined}
      */
-    var map = options['map'];
+    var map = options['map'] || null;
 
     /**
      * Opactiy of the particles.
