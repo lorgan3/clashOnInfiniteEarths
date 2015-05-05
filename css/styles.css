@@ -293,6 +293,29 @@ small {
     padding: 10px;
     box-sizing: border-box;
     border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.home-bg {
+    height: 0;
+    padding-bottom: 75%;
+    background-position: center;
+    background-size: 200px, 80px;
+    background-repeat: no-repeat, repeat;
+    box-shadow: 0 0 20px 12px;
+    margin: 5px 5px 25px 5px;
+}
+
+.singleplayer-bg {
+    background-image: url('../img/singleplayer.png'), url('../img/space.png');
+}
+
+.multi-join-bg {
+    background-image: url('../img/multi-join.png'), url('../img/space.png');
+}
+
+.multi-host-bg {
+    background-image: url('../img/multi-host.png'), url('../img/space.png');
 }
 
 .player-table tr {

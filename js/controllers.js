@@ -14,7 +14,7 @@ var app = angular.module('l3game')
      * Start the game.
      */
     $scope.launch = function() {
-        startGame($rootScope.isHost || false, $rootScope.token, $rootScope.maxplayers || 4, $rootScope.peerserver, $rootScope.peerserverport);
+        startGame($rootScope.isHost || false, $rootScope.token, $rootScope.maxplayers || 4, $rootScope.peerserver, $rootScope.peerserverport, $rootScope.servername, $rootScope.user === undefined ? 'Player' : $rootScope.user.name);
 
         // Keep the server in the list.
         if ($rootScope['private'] === false) {
@@ -24,7 +24,7 @@ var app = angular.module('l3game')
                         // Do nothing
                     });
                 }
-            }, 35000);
+            }, 10000);
         }
 
         // Remove the server from the list
@@ -56,6 +56,11 @@ var app = angular.module('l3game')
             controller: 'modalCtrl',
             scope: $scope
         });
+    };
+
+    $scope.showScore = function() {
+        showClassSelect();
+        this.close();
     }
 
     //The game was opened via a link, check the peerserver settings before continuing.
@@ -80,6 +85,7 @@ var app = angular.module('l3game')
             setCookie('peerserverport', this.server.peerport, 365);
             $rootScope.peerserver = this.server.peerserver;
             $rootScope.peerserverport = this.server.peerport;
+            $rootScope.serverName = $rootScope.token;
             $scope.launch();
             this.close();
         };
@@ -166,6 +172,7 @@ var app = angular.module('l3game')
         $rootScope.peerserver = this.server.peerserver;
         $rootScope.peerserverport = this.server.peerport;
         $rootScope.isHost = true;
+        $rootScope.servername = this.server.servername;
 
         if (this.server['private'] === false) {
             Games.save({token: token, name: this.server.servername, maxplayers: this.server.maxplayers, peerserver: this.server.peerserver, peerport: this.server.peerport}, function(data) {
@@ -187,6 +194,7 @@ var app = angular.module('l3game')
         $rootScope.peerserver = server.peerServer;
         $rootScope.peerserverport = server.peerPort;
         $rootScope.isHost = false;
+        $rootScope.servername = server.servername;
 
         $location.path('/play/' + server.key);
 
