@@ -177,6 +177,7 @@ function render() {
         control.update();
         particleHandler.update();
         animationListener.update();
+        cameraHelper.update(delta);
 
         totalDelta += delta;
         if (totalDelta >= 0.04 && myself !== undefined) {

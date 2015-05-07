@@ -6,7 +6,7 @@ goog.require('l3.objects.BaseObject');
  * A laserbeam.
  *
  * @param {Object}   model  The visual model of this laser.
- * @param {Object=} options An object containing all other options for this astroid.
+ * @param {Object=} options An object containing all other options for this asteroid.
  *
  * @constructor
  * @implements {l3.objects.BaseObject}
@@ -48,6 +48,19 @@ l3.objects.Laser = function(model, options) {
     trail.rotation.x = Math.PI/2;
     this.pivot.add(trail);
 
+    options = options || {};
+    /**
+     * Life time in seconds.
+     * @type {number}
+     */
+    this.lifetime = options.lifetime || 5;
+
+    /**
+     * Lifetime counter.
+     * @type {number}
+     */
+    this.timeAlive = 0;
+
     /**
      * A particle system for the trail.
      * @type {l3.helpers.ParticleSystem}
@@ -78,8 +91,13 @@ l3.objects.Laser.prototype.update = function(delta) {
     // Move the laser.
     this.pivot.rotation.y = (this.pivot.rotation.y + 1*delta) % (Math.PI*2);
 
-    var target = collisionHelper.hit(this.worldposition, 2, this)[0];
+    var target = collisionHelper.hit(this.worldposition, 1, this)[0];
     this.collide(target);
+
+    this.timeAlive += delta;
+    if (this.timeAlive > this.lifetime) {
+        objectHandler.remove(this);
+    }
 };
 
 /**
@@ -102,7 +120,30 @@ l3.objects.Laser.prototype.collide = function(other) {
         objectHandler.remove(this);
         objectHandler.remove(other);
         particleHandler.add({ 'amount': 1, 'directions': new THREE.Vector3(0, 0, 0), 'size': 50, 'map': downloader.get('pow'), 'lifetime': 60, 'blending': THREE.NormalBlending }).spawn(other.worldposition);
-    } else if (other instanceof l3.objects.Astroid) {
+    } else if (other instanceof l3.objects.Asteroid) {
+        downloader.get('crush').play();
+        var system = particleHandler.add({ 'amount': 150, 'position': other.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3 * other.size, 'map': downloader.get('particle'), 'lifetime': 60 });
+        system.active = false;
+
+        // Camera shake effect
+        if (myself !== undefined) {
+            var dist = players[myself].worldposition.distanceTo(other.worldposition);
+            if (dist <= 10) {
+                cameraHelper.shake(0.4, (11-dist)*15);
+            }
+        }
+
+        // Spawn more asteroids.
+        if (other.size > 0.5)
+        for (var i=0; i<2; i++) {
+            var asteroid = l3.init.PlayerFactory.Asteroid(new THREE.Vector3(0, 0, other.model.position.z - 0.5), other.model.scale.x / 2, 'asteroid2');
+            asteroid.size = other.size / 2;
+            asteroid.pivot2.matrix.copy(other.pivot2.matrix);
+            asteroid.pivot2.rotation.setFromRotationMatrix(asteroid.pivot2.matrix);
+            asteroid.pivot.rotation.y = other.pivot.rotation.y;
+            asteroid.rotateAroundObjectAxis(asteroid.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(asteroid.pivot.rotation), (Math.PI/2 + i*Math.PI));
+        }
+
         objectHandler.remove(this);
         objectHandler.remove(other);
     }

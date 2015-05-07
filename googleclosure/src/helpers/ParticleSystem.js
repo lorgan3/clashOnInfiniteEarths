@@ -54,7 +54,7 @@ l3.helpers.ParticleSystem = function(options) {
         geometry.vertices[i].drift = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).multiply(directions);
     }
 
-    this.cloud = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({ 'size': size*particleFactor, 'color': color, 'blending': blending, 'transparent': true, 'opacity': opactiy, 'map': map }));
+    this.cloud = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({ 'depthWrite': false, 'size': size*particleFactor, 'color': color, 'blending': blending, 'transparent': true, 'opacity': opactiy, 'map': map }));
     this.cloud.offset = 0;
     this.cloud.directions = directions;
 

@@ -25,9 +25,12 @@ l3.init.Downloader.prototype.init = function() {
 	this.loadImage('pow', 'img/pow.png');
 	this.loadImage('planetSkin', 'img/planet.png');
 	this.loadImage('hero1Skin', 'img/hero1.png');
+	this.loadImage('asteroid1', 'img/asteroid1.png');
+	this.loadImage('asteroid2', 'img/asteroid2.png');
 
 	this.loadSound('punch', 'snd/punch.mp3');
 	this.loadSound('swing', 'snd/swing.mp3');
+	this.loadSound('crush', 'snd/crush.mp3');
 
 	this.loadMesh('wizard', 'models/hero1.json');
 	this.loadMesh('planet', 'models/planet.json');

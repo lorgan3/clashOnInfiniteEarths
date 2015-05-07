@@ -11,6 +11,8 @@ goog.require('l3.objects.BaseObject');
  * @implements {l3.objects.BaseObject}
  */
 l3.objects.Asteroid = function(model, options) {
+    options = options || {};
+
     /**
      * The model.
      * @type {Object}
@@ -21,7 +23,7 @@ l3.objects.Asteroid = function(model, options) {
      * The size of this object (used for collisionchecking)
      * @type {number}
      */
-    this.size = 2;
+    this.size = options.size || 2;
 
     // Set up pivots to aid with the orbit.
     this.pivot = new THREE.Object3D();
@@ -29,19 +31,11 @@ l3.objects.Asteroid = function(model, options) {
     this.pivot2.add(this.pivot);
     this.pivot.add(this.model);
 
-    this.hitCooldown = 0;
-
     /**
      * The actual position in the world of this object.
      * @type {Object}
      */
     this.worldposition = new THREE.Vector3(0, 0, 0);
-
-    /**
-     * A particle system for the smoke trail.
-     * @type {l3.helpers.ParticleSystem}
-     */
-    //this.system = particleHandler.add({ 'amount': 60,  'directions': new THREE.Vector3(0.04, 0.04, 0), 'size': 4, 'map': downloader.get('particle'), 'color': 0xff0000 });
 };
 
 /** @inheritDoc */
@@ -65,9 +59,6 @@ l3.objects.Asteroid.prototype.deserialize = function(data) {
 l3.objects.Asteroid.prototype.update = function(delta) {
     // Update the worldposition.
     this.worldposition.setFromMatrixPosition(this.model.matrixWorld);
-
-    // Add new particles.
-    //this.system.spawn(this.worldposition, this.pivot2.rotation, 0.5);
 
     // Move the asteroid.
     this.pivot.rotation.y = (this.pivot.rotation.y + 0.25*delta) % (Math.PI*2);
@@ -120,6 +111,5 @@ l3.objects.Asteroid.prototype.collide = function(other) {
 /** @inheritDoc */
 l3.objects.Asteroid.prototype.destroy = function() {
     scene.remove(this.pivot2);
-    //this.system.remove();
     delete this.model;
 };
