@@ -94,8 +94,8 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport, server
     // Start the game once all materials and objects are download.
     downloader.readyCallback = function() {
         // The world everything revolves around.
-        world = downloader.addClone('planet', new THREE.Vector3(0, 0, 0), new THREE.Euler(0, Math.PI/2, 0, 'XYZ'));
-        world.material.materials[0].map = downloader.get('planetSkin');
+        //world = downloader.addClone('planet', new THREE.Vector3(0, 0, 0), new THREE.Euler(0, Math.PI/2, 0, 'XYZ'));
+        world = new THREE.Mesh(new THREE.SphereGeometry(20, 32, 32), new THREE.MeshBasicMaterial({ 'map': downloader.get('planetSkin') }));
         world.orbit = 22;
         scene.add(world);
         var geometry = new THREE.Geometry();
@@ -162,6 +162,7 @@ window['startGame'] = startGame;
 
 var totalDelta = 0;
 var totalDelta2 = 0;
+var initialised = false;
 function render() {
     var delta = clock.getDelta();
 
@@ -204,6 +205,7 @@ function render() {
     webGLRenderer.render(scene2, camera);
 
     stats.update();
+    initialised = true;
 }
 
 function initStats() {
@@ -217,6 +219,8 @@ function initStats() {
  * Spawns a hero for each player. This assumes no players exist at the time this function runs.
  */
 function gameStart() {
+    initialised = false;
+
     // The host
     l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
     myself = 0;

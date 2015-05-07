@@ -23,7 +23,7 @@ l3.init.Downloader.prototype.init = function() {
 	this.loadImage('particle', 'img/particle.png');
 	this.loadImage('smoke', 'img/smoke.png');
 	this.loadImage('pow', 'img/pow.png');
-	this.loadImage('planetSkin', 'img/planet.png');
+	this.loadImage('planetSkin', 'img/planet3.jpg');
 	this.loadImage('hero1Skin', 'img/hero1.png');
 	this.loadImage('asteroid1', 'img/asteroid1.png');
 	this.loadImage('asteroid2', 'img/asteroid2.png');

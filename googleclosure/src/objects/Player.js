@@ -150,6 +150,10 @@ l3.objects.Player.prototype.update = function(delta) {
         this.attack = false;
         this.stateMachine.triggerState('punch');
     }
+
+    // Collide with asteroids
+    var target = collisionHelper.hit(this.worldposition, 1, this)[0];
+    this.collide(target);
 };
 
 /**
@@ -168,7 +172,14 @@ l3.objects.Player.prototype.rotateAroundObjectAxis = function(object, axis, radi
 
 /** @inheritDoc */
 l3.objects.Player.prototype.collide = function(other) {
-    console.log('hit!');
+    if (other instanceof l3.objects.Asteroid) {
+        console.log(other);
+        alert('YOU');
+        alert('YES YOU');
+        alert('YOU ARE DEAD');
+
+        objectHandler.remove(other);
+    }
 };
 
 /** @inheritDoc */
