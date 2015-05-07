@@ -17,6 +17,18 @@ l3.helpers.CameraHelper = function(camera) {
      * @type {Object}
      */
     this.camera = camera;
+
+    /**
+     * The time that a camera shake lasts.
+     * @type {number}
+     */
+    this.time = 0;
+
+    /**
+     * Intensity of the shake.
+     * @type {number}
+     */
+    this.intensity = 100;
 };
 
 /**
@@ -72,4 +84,30 @@ l3.helpers.CameraHelper.prototype.setUp = function() {
             }
         }
     }
+};
+
+/**
+ * Update step for camera effects.
+ * @param {number} delta deltatime.
+ */
+l3.helpers.CameraHelper.prototype.update = function(delta) {
+    if (this.time > 0) {
+        this.time -= delta;
+        if (this.time <= 0) {
+            this.time = 0;
+            this.camera.position.x = 0;
+        } else {
+            this.camera.position.x = (this.camera.position.x + (Math.random()-0.5) * this.intensity * delta) % (this.intensity/2);
+        }
+    }
+};
+
+/**
+ * Causes the camera to shake.
+ * @param {number}  time      How long should the camera shake (in seconds).
+ * @param {number=} intensity How intense should it shake.
+ */
+l3.helpers.CameraHelper.prototype.shake = function(time, intensity) {
+    this.time += time;
+    this.intensity = intensity || 100;
 };
