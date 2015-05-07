@@ -12,7 +12,7 @@ goog.require('l3.init.PlayerFactory');
 goog.require('l3.helpers.CollisionHelper');
 goog.require('l3.html.Panel');
 goog.require('l3.html.ClassSelect');
-goog.require('l3.objects.Astroid');
+goog.require('l3.objects.Asteroid');
 goog.require('l3.helpers.PointerLockHelper');
 goog.require('l3.objects.Laser');
 
@@ -34,7 +34,7 @@ var players = [];
  * An array that contains all other objects that should be synchronized.
  * @type {Array.<l3.objects.BaseObject>}
  */
-var astroids = [];
+var asteroids = [];
 
 /**
  * A number that indicates which character in the Players array that you control.
@@ -222,6 +222,12 @@ function gameStart() {
     cameraHelper.setUp();
 
     //l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
+    for (var i=0; i<20; i++) {
+        var asteroid = l3.init.PlayerFactory.Asteroid(new THREE.Vector3(0, 0, world.orbit));
+        asteroid.pivot2.rotation.x = Math.random()*Math.PI*2;
+        asteroid.pivot2.rotation.y = Math.random()*Math.PI*2;
+        asteroid.pivot2.rotation.z = Math.random()*Math.PI*2;
+    }
 
     // Clients
     for (var i in networker.peers) {

@@ -1,16 +1,16 @@
-goog.provide('l3.objects.Astroid');
+goog.provide('l3.objects.Asteroid');
 
 goog.require('l3.objects.BaseObject');
 
 /**
- * An astroid.
- * @param {Object}  model   The visual model of this astroid.
- * @param {Object=} options An object containing all other options for this astroid.
+ * An asteroid.
+ * @param {Object}  model   The visual model of this asteroid.
+ * @param {Object=} options An object containing all other options for this asteroid.
  *
  * @constructor
  * @implements {l3.objects.BaseObject}
  */
-l3.objects.Astroid = function(model, options) {
+l3.objects.Asteroid = function(model, options) {
     /**
      * The model.
      * @type {Object}
@@ -41,18 +41,18 @@ l3.objects.Astroid = function(model, options) {
      * A particle system for the smoke trail.
      * @type {l3.helpers.ParticleSystem}
      */
-    this.system = particleHandler.add({ 'amount': 60,  'directions': new THREE.Vector3(0.04, 0.04, 0), 'size': 4, 'map': downloader.get('particle'), 'color': 0xff0000 });
+    //this.system = particleHandler.add({ 'amount': 60,  'directions': new THREE.Vector3(0.04, 0.04, 0), 'size': 4, 'map': downloader.get('particle'), 'color': 0xff0000 });
 };
 
 /** @inheritDoc */
-l3.objects.Astroid.prototype.serialize = function() {
+l3.objects.Asteroid.prototype.serialize = function() {
     return { 'r': this.pivot.rotation.y,
              'd': new Float32Array(this.pivot2.matrix.elements)
            };
 };
 
 /** @inheritDoc */
-l3.objects.Astroid.prototype.deserialize = function(data) {
+l3.objects.Asteroid.prototype.deserialize = function(data) {
     this.pivot.rotation.y = data['r'];
     this.pivot2.matrix.elements = new Float32Array(data['d']);
     this.pivot2.rotation.setFromRotationMatrix(this.pivot2.matrix);
@@ -62,14 +62,14 @@ l3.objects.Astroid.prototype.deserialize = function(data) {
  * Function that updates the enity.
  * @param  {number} delta The time in ms since the last update.
  */
-l3.objects.Astroid.prototype.update = function(delta) {
+l3.objects.Asteroid.prototype.update = function(delta) {
     // Update the worldposition.
     this.worldposition.setFromMatrixPosition(this.model.matrixWorld);
 
     // Add new particles.
-    this.system.spawn(this.worldposition, this.pivot2.rotation, 0.5);
+    //this.system.spawn(this.worldposition, this.pivot2.rotation, 0.5);
 
-    // Move the astroid.
+    // Move the asteroid.
     this.pivot.rotation.y = (this.pivot.rotation.y + 0.25*delta) % (Math.PI*2);
 
     this.model.rotation.z = (this.model.rotation.y + 3 * delta) % (Math.PI*2);
@@ -83,7 +83,7 @@ l3.objects.Astroid.prototype.update = function(delta) {
  * @param  {Object} axis    The axis to rotate it around.
  * @param  {number} radians The amount of rotation that should be applied.
  */
-l3.objects.Astroid.prototype.rotateAroundObjectAxis = function(object, axis, radians) {
+l3.objects.Asteroid.prototype.rotateAroundObjectAxis = function(object, axis, radians) {
     var rotObjectMatrix;
     rotObjectMatrix = new THREE.Matrix4();
     rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
@@ -92,16 +92,34 @@ l3.objects.Astroid.prototype.rotateAroundObjectAxis = function(object, axis, rad
 };
 
 /** @inheritDoc */
-l3.objects.Astroid.prototype.collide = function(other) {
+l3.objects.Asteroid.prototype.collide = function(other) {
     if (this.hitCooldown === 0) {
         this.hitCooldown = 0.6;
-        var angle = this.worldposition.angleTo(other.worldposition);
+        var i, j = 0, min = this.worldposition.x - other.worldposition.x;
+        if (this.worldposition.y - other.worldposition.y < min) {
+            min = this.worldposition.y - other.worldposition.y;
+            j = 1;
+        }
+        if (this.worldposition.z - other.worldposition.z < min) {
+            min = this.worldposition.z - other.worldposition.z;
+            j = 2;
+        }
+        var pos1 = new THREE.Vector3().copy(this.worldposition), pos2 = new THREE.Vector3().copy(other.worldposition);
+        pos1.setComponent(j, 0);
+        pos1.normalize();
+        pos2.setComponent(j, 0);
+        pos2.normalize();
+        var angle = pos1.angleTo(pos2);
+        console.log(angle);
+        console.log(pos1);
+        console.log(pos2);
         this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), angle * 100);
     }
 };
 
 /** @inheritDoc */
-l3.objects.Astroid.prototype.destroy = function() {
+l3.objects.Asteroid.prototype.destroy = function() {
     scene.remove(this.pivot2);
+    //this.system.remove();
     delete this.model;
 };

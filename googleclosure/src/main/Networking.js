@@ -188,11 +188,11 @@ l3.main.Networking.prototype.sendFullUpdate = function(peer) {
     for (var i in players) {
         data.push(players[i].serialize());
     }
-    for (var i in astroids) {
-        data.push(astroids[i].serialize());
+    for (var i in asteroids) {
+        data.push(asteroids[i].serialize());
     }
 
-    peer.send({'a': l3.main.Networking.States.FULL, 'p': players.length, 'b': astroids.length, 'd': data, 'i': peer.peerId});
+    peer.send({'a': l3.main.Networking.States.FULL, 'p': players.length, 'b': asteroids.length, 'd': data, 'i': peer.peerId});
 };
 
 /**
@@ -205,7 +205,7 @@ l3.main.Networking.prototype.receiveFullUpdate = function(data) {
     }
 
     for (var i=0; i<data['b']; i++) {
-        l3.init.PlayerFactory.Astroid(new THREE.Vector3(0, 0, world.orbit));
+        l3.init.PlayerFactory.Asteroid(new THREE.Vector3(0, 0, world.orbit));
     }
 
     var j = 0;
@@ -213,8 +213,8 @@ l3.main.Networking.prototype.receiveFullUpdate = function(data) {
         players[i].deserialize(data['d'][j]);
         j++;
     }
-    for (var i in astroids) {
-        astroids[i].deserialize(data['d'][j]);
+    for (var i in asteroids) {
+        asteroids[i].deserialize(data['d'][j]);
         j++;
     }
 };
@@ -231,8 +231,8 @@ l3.main.Networking.prototype.sendQuickUpdate = function() {
     for (var i in players) {
         data.push(players[i].serialize());
     }
-    for (var i in astroids) {
-        data.push(astroids[i].serialize());
+    for (var i in asteroids) {
+        data.push(asteroids[i].serialize());
     }
 
     this.broadcast({'a': l3.main.Networking.States.QUICK, 'd': data});
@@ -248,8 +248,8 @@ l3.main.Networking.prototype.receiveQuickUpdate = function(data) {
         players[i].deserialize(data[j]);
         j++;
     }
-    for (var i in astroids) {
-        astroids[i].deserialize(data[j]);
+    for (var i in asteroids) {
+        asteroids[i].deserialize(data[j]);
         j++;
     }
 };

@@ -28,8 +28,8 @@ l3.helpers.ObjectHandler.prototype.add = function(object) {
     // Also add to the players array.
     if (object instanceof l3.objects.Player) {
         players.push(object);
-    } else if (object instanceof l3.objects.Astroid) {
-        astroids.push(object);
+    } else if (object instanceof l3.objects.Asteroid) {
+        asteroids.push(object);
     }
 };
 
@@ -43,8 +43,8 @@ l3.helpers.ObjectHandler.prototype.remove = function(object) {
         this.objects.splice(i, 1);
         if (object instanceof l3.objects.Player) {
             players.splice(players.indexOf(object), 1);
-        } else if (object instanceof l3.objects.Astroid) {
-            astroids.splice(astroids.indexOf(object), 1);
+        } else if (object instanceof l3.objects.Asteroid) {
+            asteroids.splice(asteroids.indexOf(object), 1);
         }
 
         object.destroy();
@@ -60,8 +60,8 @@ l3.helpers.ObjectHandler.prototype.removeAt = function(index) {
     if (object !== undefined) {
         if (object instanceof l3.objects.Player) {
             players.splice(players.indexOf(object), 1);
-        } else if (object instanceof l3.objects.Astroid) {
-            astroids.splice(astroids.indexOf(object), 1);
+        } else if (object instanceof l3.objects.Asteroid) {
+            asteroids.splice(asteroids.indexOf(object), 1);
         }
 
         this.objects.splice(index, 1);

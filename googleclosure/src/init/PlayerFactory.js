@@ -66,21 +66,28 @@ l3.init.PlayerFactory.Wizard = function(position) {
 };
 
 /**
- * Sets up an astroid.
- * @param  {Object=}            position The position to place the astroid.
- * @return {l3.objects.Astroid}          The astroid.
+ * Sets up an asteroid.
+ * @param  {Object=}             position The position to place the asteroid.
+ * @param  {number=}             size     The size of this asteroid.
+ * @param  {string=}             sprite   Which sprite to use for this astroid.
+ * @return {l3.objects.Asteroid}          The asteroid.
  */
-l3.init.PlayerFactory.Astroid = function(position) {
-    var model = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshLambertMaterial({ color: 0x965D2F }));
+l3.init.PlayerFactory.Asteroid = function(position, size, sprite) {
+    size = size || 15;
+    sprite = sprite || 'asteroid1';
+
+    //var model = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshLambertMaterial({ color: 0x965D2F }));
+    var model = new THREE.Sprite(new THREE.SpriteMaterial({'map': downloader.get(sprite), 'color': 0xffffff }));
+    model.scale.set(size, size, size);
     model.position.copy(position);
 
-    var astroid = new l3.objects.Astroid(model);
-    objectHandler.add(astroid);
+    var asteroid = new l3.objects.Asteroid(model);
+    objectHandler.add(asteroid);
 
-    // Add the astroid's 2nd pivot to the scene rather than the model itself for the orbit to work.
-    scene.add(astroid.pivot2);
+    // Add the asteroid's 2nd pivot to the scene rather than the model itself for the orbit to work.
+    scene.add(asteroid.pivot2);
 
-    return astroid;
+    return asteroid;
 };
 
 /**
