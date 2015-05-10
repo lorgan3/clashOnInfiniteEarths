@@ -21,7 +21,7 @@ l3.helpers.CollisionHelper = function(debug) {
  * @return {Array.<l3.objects.BaseObject>}         A list of targets within range.
  */
 l3.helpers.CollisionHelper.prototype.hit = function(position, range, self, multi) {
-    if (!initialised) {
+    if (time === 0) {
         return [];
     }
 

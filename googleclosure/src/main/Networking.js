@@ -35,7 +35,7 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
             other.on('open', function() {
                 self.addListeners(other);
                 self.peers.push(other);
-                other.peerId = self.peers.length;
+                other.peerId = undefined;
                 other.name = 'Player';
                 other.kills = 0;
                 other.deaths = 0;
@@ -84,9 +84,12 @@ l3.main.Networking.States = {
     QUICK: 3,
     PLAYER_SPAWN: 4,
     PLAYER_DIE: 5,
-    RESET: 6,
-    HELLO: 7,
-    PLAYERLIST: 8
+    PLAYER_REMOVE: 6,
+    RESET: 7,
+    HELLO: 8,
+    PLAYERLIST: 9,
+    ASTEROID_SPAWN: 10,
+    ASTEROID_DIE: 11
 };
 
 /**
@@ -119,6 +122,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
 
     connection.on('disconnected', function() {
         connection.reconnect();
+        panel.hide();
     });
 
     connection.on('data', function(data) {
@@ -154,25 +158,44 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                     // Receive all data to setup a game.
                     self.receiveFullUpdate(data);
 
-                    if (players.length > data['i']) {
+                    if (data['i'] !== undefined && data['i'] !== null) {
                         myself = data['i'];
-                        cameraHelper.setUp();
+                    } else {
+                        myself = undefined;
                     }
+                    cameraHelper.setUp();
                 break;
                 case l3.main.Networking.States.PLAYER_SPAWN:
                     // Spawn a player.
                     l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
                 break;
                 case l3.main.Networking.States.PLAYER_DIE:
-                    // Remove a player.
+                    // kill a player.
+                    players[data['i']].collide();
+                break;
+                case l3.main.Networking.States.PLAYER_REMOVE:
+                    // Actually remove the player
                     var player = players[data['i']];
                     var myPlayer = players[myself];
                     objectHandler.remove(player);
                     myself = players.indexOf(myPlayer);
+                    if (myself === -1) {
+                        myself = undefined;
+                        cameraHelper.setUp();
+                    }
                 break;
                 case l3.main.Networking.States.RESET:
                     // Stop the game.
                     gameEnd();
+                break;
+                case l3.main.Networking.States.ASTEROID_SPAWN:
+                    // Spawn an asteroid.
+                    var asteroid = l3.init.PlayerFactory.Asteroid(new THREE.Vector3(0, 0, world.orbit), undefined, 'asteroid2');
+                    asteroid.deserialize(data['d']);
+                break;
+                case l3.main.Networking.States.ASTEROID_DIE:
+                    // Kill an asteroid.
+                    asteroids[data['i']].collide();
                 break;
             }
         }
@@ -213,10 +236,14 @@ l3.main.Networking.prototype.receiveFullUpdate = function(data) {
         players[i].deserialize(data['d'][j]);
         j++;
     }
+
+    var targets = 0;
     for (var i in asteroids) {
         asteroids[i].deserialize(data['d'][j]);
+        targets += asteroids[i].size === 2 ? 1 : 0;
         j++;
     }
+    hud.updateTargets(targets);
 };
 
 /**
@@ -229,10 +256,10 @@ l3.main.Networking.prototype.sendQuickUpdate = function() {
 
     var data = [];
     for (var i in players) {
-        data.push(players[i].serialize());
+        data.push(players[i].serializeQuick());
     }
     for (var i in asteroids) {
-        data.push(asteroids[i].serialize());
+        data.push(asteroids[i].serializeQuick());
     }
 
     this.broadcast({'a': l3.main.Networking.States.QUICK, 'd': data});
@@ -245,11 +272,11 @@ l3.main.Networking.prototype.sendQuickUpdate = function() {
 l3.main.Networking.prototype.receiveQuickUpdate = function(data) {
     var j = 0;
     for (var i in players) {
-        players[i].deserialize(data[j]);
+        players[i].deserializeQuick(data[j]);
         j++;
     }
     for (var i in asteroids) {
-        asteroids[i].deserialize(data[j]);
+        asteroids[i].deserializeQuick(data[j]);
         j++;
     }
 };
@@ -286,7 +313,7 @@ l3.main.Networking.prototype.deserializeState = function(data, id) {
                 players[i].deserializeState(data[i]);
             }
         }
-    } else {
+    } else if (id !== undefined) {
         players[id].deserializeState(data);
     }
 };

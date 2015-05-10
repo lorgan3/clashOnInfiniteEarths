@@ -63,6 +63,12 @@ l3.html.ClassSelect = function(container, isHost, serverName) {
     this.panel.appendChild(this.panel.head);
     this.panel.appendChild(this.panel.body);
     container.appendChild(this.panel);
+
+    /**
+     * Is the panel hidden?
+     * @type {boolean}
+     */
+    this.hidden = true;
 };
 
 /**
@@ -70,6 +76,7 @@ l3.html.ClassSelect = function(container, isHost, serverName) {
  */
 l3.html.ClassSelect.prototype.show = function() {
     this.panel.style.display = 'block';
+    this.hidden = false;
 };
 
 /**
@@ -77,6 +84,7 @@ l3.html.ClassSelect.prototype.show = function() {
  */
 l3.html.ClassSelect.prototype.hide = function() {
     this.panel.style.display = 'none';
+    this.hidden = true;
 };
 
 /**
