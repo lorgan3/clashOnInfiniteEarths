@@ -23,7 +23,7 @@ l3.init.Downloader.prototype.init = function() {
 	this.loadImage('particle', 'img/particle.png');
 	this.loadImage('smoke', 'img/smoke.png');
 	this.loadImage('pow', 'img/pow.png');
-	this.loadImage('planetSkin', 'img/planet3.jpg');
+	this.loadImage('planetSkin', 'img/earth.jpg');
 	this.loadImage('hero1Skin', 'img/hero1.png');
 	this.loadImage('asteroid1', 'img/asteroid1.png');
 	this.loadImage('asteroid2', 'img/asteroid2.png');
@@ -31,6 +31,7 @@ l3.init.Downloader.prototype.init = function() {
 	this.loadSound('punch', 'snd/punch.mp3');
 	this.loadSound('swing', 'snd/swing.mp3');
 	this.loadSound('crush', 'snd/crush.mp3');
+	this.loadSound('scream', 'snd/scream.mp3');
 
 	this.loadMesh('wizard', 'models/hero1.json');
 	this.loadMesh('planet', 'models/planet.json');

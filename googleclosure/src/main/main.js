@@ -12,6 +12,7 @@ goog.require('l3.init.PlayerFactory');
 goog.require('l3.helpers.CollisionHelper');
 goog.require('l3.html.Panel');
 goog.require('l3.html.ClassSelect');
+goog.require('l3.html.Hud');
 goog.require('l3.objects.Asteroid');
 goog.require('l3.helpers.PointerLockHelper');
 goog.require('l3.objects.Laser');
@@ -56,7 +57,7 @@ var particleFactor = 0.3;
 var world;
 
 // Extra global variables.
-var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panel, stats, classSelect,
+var scene, camera, animationListener, particleHandler, objectHandler, cameraHelper, scene2, game, panel, stats, classSelect, hud,
     networker, downloader, collisionHelper, pointerLockHelper, control, webGLRenderer, spotLight, light, clock;
 
 /**
@@ -79,8 +80,10 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport, server
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     // Various objects to help with the game.
-    panel = new l3.html.Panel(document.getElementById('container'));
-    classSelect = new l3.html.ClassSelect(document.getElementById('container'), (isHost || token === undefined), serverName);
+    var container = document.getElementById('container');
+    panel = new l3.html.Panel(container);
+    hud = new l3.html.Hud(container);
+    classSelect = new l3.html.ClassSelect(container, (isHost || token === undefined), serverName);
     networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport, playerName);
     animationListener = new l3.helpers.AnimationListener();
     objectHandler = new l3.helpers.ObjectHandler();
@@ -95,12 +98,13 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport, server
     downloader.readyCallback = function() {
         // The world everything revolves around.
         //world = downloader.addClone('planet', new THREE.Vector3(0, 0, 0), new THREE.Euler(0, Math.PI/2, 0, 'XYZ'));
+        downloader.get('planetSkin').mapping = THREE.SphericalReflectionMapping;
         world = new THREE.Mesh(new THREE.SphereGeometry(20, 32, 32), new THREE.MeshBasicMaterial({ 'map': downloader.get('planetSkin') }));
         world.orbit = 22;
         scene.add(world);
         var geometry = new THREE.Geometry();
         for (var i=0; i<200; i++) {
-            geometry.vertices[i] = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize().multiplyScalar(50);
+            geometry.vertices[i] = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize().multiplyScalar(60);
         }
         var stars = new THREE.PointCloud(geometry, new THREE.PointCloudMaterial({ 'size': 10 * particleFactor, 'blending': THREE.AdditiveBlending, 'transparent': true, 'color': 0xffffff,  'map': downloader.get('particle') }));
         world.add(stars);
@@ -162,7 +166,7 @@ window['startGame'] = startGame;
 
 var totalDelta = 0;
 var totalDelta2 = 0;
-var initialised = false;
+var time = 0;
 function render() {
     var delta = clock.getDelta();
 
@@ -191,9 +195,12 @@ function render() {
         }
 
         totalDelta2 += delta;
-        if (totalDelta2 >= 1 && networker.isHost === true) {
+        if (totalDelta2 >= 1) {
             totalDelta2 = 0;
-            networker.sendQuickUpdate();
+            hud.updateTime(time);
+            if (networker.isHost === true) {
+                networker.sendQuickUpdate();
+            }
         }
     }
 
@@ -205,7 +212,13 @@ function render() {
     webGLRenderer.render(scene2, camera);
 
     stats.update();
-    initialised = true;
+    if (time === 0) {
+        // Because threeJS calculates the worldmatrix 1 frame after creating an object, the full update has to be sent now.
+        for (var i in networker.peers) {
+            networker.sendFullUpdate(networker.peers[i]);
+        }
+    }
+    time += delta;
 }
 
 function initStats() {
@@ -219,19 +232,25 @@ function initStats() {
  * Spawns a hero for each player. This assumes no players exist at the time this function runs.
  */
 function gameStart() {
-    initialised = false;
+    time = 0;
 
     // The host
     l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
     myself = 0;
     cameraHelper.setUp();
 
-    //l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
-    for (var i=0; i<20; i++) {
+    var amount = networker.token === undefined ? 20 : 5;
+    for (var i=0; i<amount; i++) {
         var asteroid = l3.init.PlayerFactory.Asteroid(new THREE.Vector3(0, 0, world.orbit));
         asteroid.pivot2.rotation.x = Math.random()*Math.PI*2;
         asteroid.pivot2.rotation.y = Math.random()*Math.PI*2;
         asteroid.pivot2.rotation.z = Math.random()*Math.PI*2;
+    }
+
+    if (networker.token === undefined) {
+        hud.updateTargets(amount);
+    } else {
+        hud.updateTargets(networker.peers);
     }
 
     // Clients
@@ -239,11 +258,8 @@ function gameStart() {
         var player = l3.init.PlayerFactory.Wizard(new THREE.Vector3(0, 0, world.orbit-1.5));
         player.pivot2.rotation.x = (i+1)/(networker.peers.length+1) * Math.PI * 2;
         player.pivot2.updateMatrix();
-    }
 
-    // Tell the clients.
-    for (var i in networker.peers) {
-        networker.sendFullUpdate(networker.peers[i]);
+        networker.peers[i].peerId = players.indexOf(player);
     }
 }
 
@@ -265,6 +281,9 @@ function gameEnd() {
     // Also tell the clients
     if (networker.isHost === true) {
         networker.broadcast({'a': l3.main.Networking.States.RESET});
+        for (var i in networker.peers) {
+            networker.peers[i].peerId = undefined;
+        }
     }
 }
 

@@ -29,6 +29,12 @@ l3.helpers.CameraHelper = function(camera) {
      * @type {number}
      */
     this.intensity = 100;
+
+    /**
+     * Was the camera following a player?
+     * @type {boolean}
+     */
+    this.followedPlayer = false;
 };
 
 /**
@@ -36,12 +42,14 @@ l3.helpers.CameraHelper = function(camera) {
  */
 l3.helpers.CameraHelper.prototype.setUp = function() {
     var wasFollowingObject = false;
-    if (this.target !== null) {
-        wasFollowingObject = (this.target instanceof l3.objects.BaseObject);
+    if (this.target === world) {
         this.target.remove(this.camera);
+    } else if (this.target !== null && this.target !== undefined && this.target.model !== undefined) {
+        this.target.model.remove(this.camera);
     }
 
     if (myself === undefined || myself < 0) {
+        hud.hide();
         this.target = world;
         this.camera.position.set(0, 0, 60);
         this.camera.lookAt(world.position);
@@ -49,20 +57,28 @@ l3.helpers.CameraHelper.prototype.setUp = function() {
 
         // Scale the particles depending on the view.
         particleFactor = 0.3;
-        if (wasFollowingObject === true) {
+        if (this.followedPlayer === true) {
+            this.followedPlayer = false;
             for (var i in particleHandler.system.children) {
                 particleHandler.system.children[i].material.size *= particleFactor;
             }
             for (var i in world.children) {
                 if (world.children[i] instanceof THREE.PointCloud) {
                     world.children[i].material.size *= particleFactor;
+                } else if (world.children[i] instanceof THREE.Object3D) {
+                    if (world.children[i].isSprite === true) {
+                        var sprite = world.children[i].children[0].children[0];
+                        var scale = sprite.scale.x * particleFactor;
+                        sprite.scale.set(scale, scale, scale)
+                    }
                 }
             }
         }
     } else {
-        this.target = players[myself].model;
+        this.target = players[myself];
+        hud.show();
 
-        this.target.add(this.camera);
+        this.target.model.add(this.camera);
         this.camera.rotation.x = -0.95;
         this.camera.rotation.z = 0;
         this.camera.rotation.y = 0;
@@ -73,13 +89,20 @@ l3.helpers.CameraHelper.prototype.setUp = function() {
 
         // Scale the particles depending on the view.
         particleFactor = 1;
-        if (wasFollowingObject === false) {
+        if (this.followedPlayer === false) {
+            this.followedPlayer = true;
             for (var i in particleHandler.system.children) {
                 particleHandler.system.children[i].material.size *= 3.33;
             }
             for (var i in world.children) {
                 if (world.children[i] instanceof THREE.PointCloud) {
                     world.children[i].material.size *= 3.33;
+                } else if (world.children[i] instanceof THREE.Object3D) {
+                    if (world.children[i].isSprite === true) {
+                        var sprite = world.children[i].children[0].children[0];
+                        var scale = sprite.scale.x * 3.33;
+                        sprite.scale.set(scale, scale, scale)
+                    }
                 }
             }
         }

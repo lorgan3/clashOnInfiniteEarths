@@ -12,8 +12,6 @@ l3.main.Control = function(game) {
     this.clicks = [];
 
     var self = this;
-    var move = document.getElementById('move');
-    var attack = document.getElementById('attack')
 
     // HTML5 Pointer lock api to turn in normal devices.
     game.addEventListener('mousemove', function(e) {
@@ -36,43 +34,63 @@ l3.main.Control = function(game) {
         });
     }
 
-    // Listeners for mouse clicks.
-    move.addEventListener('touchstart', function(e) {
-        self.clicks[l3.main.Control.Mouse.LEFT] = true;
+    // Select a new ability on mobile devices.
+    hud.panel.addEventListener('touchstart', function(e) {
+        if (e.target !== undefined) {
+            hud.select(e.target.index);
+            self.clicks[l3.main.Control.Mouse.RIGHT] = true;
+        }
 
         e.preventDefault();
         e.stopPropagation();
         return false;
     });
-    move.addEventListener('touchend', function(e) {
-        self.clicks[l3.main.Control.Mouse.LEFT] = false;
+    hud.panel.addEventListener('touchend', function(e) {
+        if (e.target !== undefined) {
+            hud.select(e.target.index);
+            self.clicks[l3.main.Control.Mouse.RIGHT] = false;
+        }
 
         e.preventDefault();
         e.stopPropagation();
         return false;
     });
 
-    attack.addEventListener('touchstart', function(e) {
+    // Select a new ability on desktop.
+    document.addEventListener('wheel', function(e) {
+        hud.select(hud.selected + (e.wheelDelta < 0 ? 1 : -1));
+    });
+
+    // Execute ability on mobile.
+    /*hud.triggerArea.addEventListener('touchstart', function(e) {
         self.clicks[l3.main.Control.Mouse.RIGHT] = true;
 
         e.preventDefault();
         e.stopPropagation();
         return false;
     });
-    attack.addEventListener('touchend', function(e) {
+    hud.triggerArea.addEventListener('touchend', function(e) {
         self.clicks[l3.main.Control.Mouse.RIGHT] = false;
 
         e.preventDefault();
         e.stopPropagation();
         return false;
-    });
+    });*/
 
-    game.addEventListener('mousedown', function(e) {
+    hud.triggerArea.addEventListener('click', function() {
+        // Prevent the event when a panel is visible.
+        if (panel.hidden === false || classSelect.hidden === false) {
+            return;
+        }
+
         // Lock the pointer
         if (pointerLockHelper.locked === false) {
             pointerLockHelper.lock(game);
         }
+    });
 
+    // Execute ability on desktop.
+    game.addEventListener('mousedown', function(e) {
         switch(e.which) {
             case 1: // left
                 self.clicks[l3.main.Control.Mouse.LEFT] = true;
@@ -112,6 +130,7 @@ l3.main.Control = function(game) {
         e.preventDefault();
     });
 
+    // Show scoreboard.
     document.addEventListener('keydown', function(e) {
         if (e.keyCode === 9) {
             classSelect.show();
@@ -147,6 +166,6 @@ l3.main.Control.prototype.update = function() {
     }
 
     // The rotation is set when the game sends a quick update.
-    players[myself].move = this.clicks[l3.main.Control.Mouse.LEFT];
+    //players[myself].move = this.clicks[l3.main.Control.Mouse.LEFT];
     players[myself].attack = this.clicks[l3.main.Control.Mouse.RIGHT];
 };

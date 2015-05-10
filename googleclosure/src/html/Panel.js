@@ -51,6 +51,12 @@ l3.html.Panel = function(container) {
      * @type {number|undefined}
      */
     this.progress = 0;
+
+    /**
+     * Is the panel hidden?
+     * @type {boolean}
+     */
+    this.hidden = true;
 };
 
 /**
@@ -76,6 +82,7 @@ l3.html.Panel.types = {
 l3.html.Panel.prototype.set = function(type, title, content, progress, critical) {
     this.panel.style.display = 'block';
     this.panel.className = 'panel panel-' + type;
+    this.hidden = false;
 
     this.panel.headTitle.textContent = title;
     this.panel.message.textContent = content;
@@ -115,4 +122,5 @@ l3.html.Panel.prototype.updateProgress = function(progress) {
  */
 l3.html.Panel.prototype.hide = function() {
     this.panel.style.display = 'none';
+    this.hidden = true;
 };
