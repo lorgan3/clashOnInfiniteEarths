@@ -77,8 +77,8 @@ l3.main.Control = function(game) {
         return false;
     });*/
 
-    hud.triggerArea.addEventListener('click', function() {
-        // Prevent the event when a panel is visible.
+    // Execute ability on desktop.
+    game.addEventListener('mousedown', function(e) {
         if (panel.hidden === false || classSelect.hidden === false) {
             return;
         }
@@ -87,10 +87,7 @@ l3.main.Control = function(game) {
         if (pointerLockHelper.locked === false) {
             pointerLockHelper.lock(game);
         }
-    });
 
-    // Execute ability on desktop.
-    game.addEventListener('mousedown', function(e) {
         switch(e.which) {
             case 1: // left
                 self.clicks[l3.main.Control.Mouse.LEFT] = true;
@@ -143,6 +140,12 @@ l3.main.Control = function(game) {
     document.addEventListener('keyup', function(e) {
         if (e.keyCode === 9) {
             classSelect.hide();
+        } else if (e.keyCode === 49) {
+            hud.select(1);
+        } else if (e.keyCode === 50) {
+            hud.select(2);
+        } else if (e.keyCode === 51) {
+            hud.select(3);
         }
     });
 };
@@ -166,6 +169,5 @@ l3.main.Control.prototype.update = function() {
     }
 
     // The rotation is set when the game sends a quick update.
-    //players[myself].move = this.clicks[l3.main.Control.Mouse.LEFT];
-    players[myself].attack = this.clicks[l3.main.Control.Mouse.RIGHT];
+    players[myself].attack = this.clicks[l3.main.Control.Mouse.RIGHT] || this.clicks[l3.main.Control.Mouse.LEFT];
 };

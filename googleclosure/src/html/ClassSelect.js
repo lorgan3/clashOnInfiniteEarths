@@ -44,9 +44,11 @@ l3.html.ClassSelect = function(container, isHost, serverName) {
         this.panel.backButton = document.createElement('a');
         this.panel.backButton.className = 'btn btn-default';
         this.panel.backButton.onclick = function() {
+            gameEnd();
             gameStart();
             classSelect.hide();
             classSelect.hideMessage();
+            pointerLockHelper.lock(game);
         };
         this.panel.backButton.textContent = 'start game';
         this.panel.backButton.style.display = 'inline-block';
@@ -77,6 +79,11 @@ l3.html.ClassSelect = function(container, isHost, serverName) {
 l3.html.ClassSelect.prototype.show = function() {
     this.panel.style.display = 'block';
     this.hidden = false;
+
+    if (players.length === 0) {
+        pointerLockHelper.unlock();
+        this.showMessage();
+    }
 };
 
 /**

@@ -281,7 +281,7 @@ l3.objects.Player.prototype.collide = function(other) {
 /** @inheritDoc */
 l3.objects.Player.prototype.destroy = function() {
     if (this.dead === true && (networker.isHost || networker.token === undefined)) {
-        window.setTimeout(showClassSelect, 5000);
+        window.setTimeout(showClassSelect, 2000);
     }
 
     scene.remove(this.pivot2);

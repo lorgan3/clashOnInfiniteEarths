@@ -46,14 +46,6 @@ l3.html.Hud = function(container) {
     container.appendChild(this.panel);
 
     /**
-     * A trigger area for mobile users.
-     * @type {Element}
-     */
-    this.triggerArea = document.createElement('div');
-    this.triggerArea.className = 'trigger';
-    container.appendChild(this.triggerArea);
-
-    /**
      * Shorthand for quickly selecting an ability.
      * @type {Array}
      */
@@ -154,4 +146,8 @@ l3.html.Hud.prototype.updateTargets = function(targets) {
         this.targets = targets;
     }
     this.panel.targets.textContent = this.targets + '/' + this.maxTargets;
+
+    if (this.targets === 0) {
+        alert('YOU WIN');
+    }
 };

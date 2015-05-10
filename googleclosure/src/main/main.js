@@ -277,6 +277,7 @@ function gameEnd() {
 
     myself = undefined;
     cameraHelper.setUp();
+    hud.select(1);
 
     // Also tell the clients
     if (networker.isHost === true) {

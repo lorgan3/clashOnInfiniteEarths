@@ -30,9 +30,9 @@ l3.helpers.PointerLockHelper.prototype.lock = function(element) {
  * Unlocks the cursor.
  */
 l3.helpers.PointerLockHelper.prototype.unlock = function() {
-    var unlock = document['exitPointerLock'] || document['mozExitPointerLock'] || document['webkitExitPointerLock'];
-    if (unlock !== undefined) {
-        unlock();
+    document.unlock = document['exitPointerLock'] || document['mozExitPointerLock'] || document['webkitExitPointerLock'];
+    if (document.unlock !== undefined) {
+        document.unlock();
     }
 };
 
