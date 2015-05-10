@@ -85,11 +85,12 @@ l3.main.Networking.States = {
     PLAYER_SPAWN: 4,
     PLAYER_DIE: 5,
     PLAYER_REMOVE: 6,
-    RESET: 7,
-    HELLO: 8,
-    PLAYERLIST: 9,
-    ASTEROID_SPAWN: 10,
-    ASTEROID_DIE: 11
+    PLAYER_STUN: 7,
+    RESET: 8,
+    HELLO: 9,
+    PLAYERLIST: 10,
+    ASTEROID_SPAWN: 11,
+    ASTEROID_DIE: 12
 };
 
 /**
@@ -184,6 +185,10 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                         cameraHelper.setUp();
                     }
                 break;
+                case l3.main.Networking.States.PLAYER_STUN:
+                    // stun the player
+                    players[data['i']].stun();
+                break;
                 case l3.main.Networking.States.RESET:
                     // Stop the game.
                     gameEnd();
@@ -237,13 +242,8 @@ l3.main.Networking.prototype.receiveFullUpdate = function(data) {
         j++;
     }
 
-    var targets = 0;
-    for (var i in asteroids) {
-        asteroids[i].deserialize(data['d'][j]);
-        targets += asteroids[i].size === 2 ? 1 : 0;
-        j++;
-    }
-    hud.updateTargets(targets);
+    hud.maxTargets = data['p']-1;
+    hud.updateTargets(data['p']-1);
 };
 
 /**

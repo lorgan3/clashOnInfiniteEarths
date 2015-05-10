@@ -32,6 +32,7 @@ l3.init.Downloader.prototype.init = function() {
 	this.loadSound('swing', 'snd/swing.mp3');
 	this.loadSound('crush', 'snd/crush.mp3');
 	this.loadSound('scream', 'snd/scream.mp3');
+	this.loadSound('stun', 'snd/stun.mp3');
 
 	this.loadMesh('wizard', 'models/hero1.json');
 	this.loadMesh('planet', 'models/planet.json');

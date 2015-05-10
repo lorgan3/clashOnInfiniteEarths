@@ -112,7 +112,6 @@ l3.objects.Asteroid.prototype.update = function(delta) {
         // Because threeJS calculates the worldmatrix 1 frame after creating an object, the full update has to be sent now.
         this.shouldSync = false;
         networker.broadcast({ 'a': l3.main.Networking.States.ASTEROID_SPAWN, 'd': this.serialize() });
-        console.log('yes');
     }
 };
 

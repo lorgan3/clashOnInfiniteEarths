@@ -80,6 +80,12 @@ l3.objects.Player = function(model, stateMachine, options) {
     this.speed = 0;
 
     /**
+     * The player stun cooldown, if it's >0 the player is stunned.
+     * @type {number}
+     */
+    this.stunned = 0;
+
+    /**
      * The actual position in the world of this object.
      * @type {Object}
      */
@@ -157,40 +163,52 @@ l3.objects.Player.prototype.update = function(delta) {
     }
 
     if (this.dead === false) {
-        // Set the speed and move the player in orbit.
-        this.speed = Math.max(0.25, this.speed - 1 * delta);
-        this.pivot.rotation.y = (this.pivot.rotation.y + this.speed*delta) % (Math.PI*2);
+        if (this.stunned > 0) {
+            this.stunned -= delta;
+            this.pivot.rotation.y = (this.pivot.rotation.y + 0.2*delta) % (Math.PI*2);
+            this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), (Math.floor(this.stunned*10)%4 === 0 ? 1 : -1) * delta);
 
-        // Change orbit.
-        if (this.rotation !== 0) {
-            this.rotation = Math.max(-3, Math.min(3, this.rotation));
-            this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), this.rotation * delta * 0.5);
-        }
+            if (this.stunned <= 0) {
+                this.stunned = 0;
+            }
+        } else {
+            // Set the speed and move the player in orbit.
+            this.speed = Math.max(0.25, this.speed - 1 * delta);
+            this.pivot.rotation.y = (this.pivot.rotation.y + this.speed*delta) % (Math.PI*2);
 
-        // Speed up.
-        if (this.move === true) {
-            this.speed = Math.min(1, this.speed + 2 * delta);
-        }
+            // Change orbit.
+            if (this.rotation !== 0) {
+                this.rotation = Math.max(-3, Math.min(3, this.rotation));
+                this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), this.rotation * delta * 0.5);
+            }
 
-        if (this.attack === true) {
-            this.attack = false;
-            switch(this.ability) {
-                case 0:
-                    this.stateMachine.triggerState('laser');
-                break;
-                case 1:
-                    this.stateMachine.triggerState('punch');
-                break;
-                case 2:
-                    this.stateMachine.triggerState('speed');
-                break;
+            // Speed up.
+            if (this.move === true) {
+                this.speed = Math.min(1, this.speed + 2 * delta);
+            }
+
+            if (this.attack === true) {
+                this.attack = false;
+                switch(this.ability) {
+                    case 0:
+                        this.stateMachine.triggerState('laser');
+                    break;
+                    case 1:
+                        this.stateMachine.triggerState('punch');
+                    break;
+                    case 2:
+                        this.stateMachine.triggerState('speed');
+                    break;
+                }
             }
         }
 
         // Collide with asteroids
         var target = collisionHelper.hit(this.worldposition, 1, this)[0];
         if (target !== undefined && (networker.isHost === true || networker.token === undefined)) {
-            this.collide(target);
+            if (target instanceof l3.objects.Asteroid === true) {
+                this.collide(target);
+            }
         }
     } else {
         this.pivot.rotation.y = (this.pivot.rotation.y - 0.4*delta) % (Math.PI*2);
@@ -245,31 +263,48 @@ l3.objects.Player.prototype.rotateAroundObjectAxis = function(object, axis, radi
 
 /** @inheritDoc */
 l3.objects.Player.prototype.collide = function(other) {
-    if (other instanceof l3.objects.Asteroid || other === undefined) {
-        if (networker.isHost === true) {
-            networker.broadcast({ 'a': l3.main.Networking.States.PLAYER_DIE, 'i': players.indexOf(this) });
-        }
-
-        if (networker.token !== undefined) {
-            hud.updateTargets();
-        }
-
-        downloader.get('scream').play();
-        this.stateMachine.triggerState('getHit');
-        this.dead = true;
-        var system = particleHandler.add({ 'amount': 50, 'position': this.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3, 'map': downloader.get('particle'), 'lifetime': 60, 'color': 0xff0000 });
-        system.active = false;
+    if (networker.isHost === true) {
+        networker.broadcast({ 'a': l3.main.Networking.States.PLAYER_DIE, 'i': players.indexOf(this) });
     }
+
+    if (networker.token !== undefined) {
+        hud.updateTargets();
+    }
+
+    downloader.get('scream').play();
+    this.stateMachine.triggerState('getHit');
+    this.dead = true;
+    var system = particleHandler.add({ 'amount': 50, 'position': this.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3, 'map': downloader.get('particle'), 'lifetime': 60, 'color': 0xff0000 });
+    system.active = false;
 };
 
 /** @inheritDoc */
 l3.objects.Player.prototype.destroy = function() {
+    if (this.dead === true && (networker.isHost || networker.token === undefined)) {
+        window.setTimeout(showClassSelect, 5000);
+    }
+
     scene.remove(this.pivot2);
     if (this.reticle !== undefined) {
         scene2.remove(this.reticle);
     }
-    this.system.remove();
+
+    this.system.cloud.emit = 4;
+    this.system.fade(true);
 
     delete this.model;
     delete this.stateMachine;
+};
+
+/**
+ * Stuns the player
+ */
+l3.objects.Player.prototype.stun = function() {
+    if (networker.isHost === true) {
+        networker.broadcast({ 'a': l3.main.Networking.States.PLAYER_STUN, 'i': players.indexOf(this) });
+    }
+    downloader.get('stun').play();
+    var system = particleHandler.add({ 'amount': 50, 'position': this.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3, 'map': downloader.get('particle'), 'lifetime': 60, 'color': 0xff0000 });
+    system.active = false;
+    this.stunned = 3;
 };

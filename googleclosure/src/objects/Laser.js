@@ -129,9 +129,8 @@ l3.objects.Laser.prototype.collide = function(other) {
     if (other instanceof l3.objects.Player && other !== this.owner) {
         objectHandler.remove(this);
         if (networker.isHost === true || networker.token === undefined) {
-            objectHandler.remove(other);
+            other.stun();
         }
-        particleHandler.add({ 'amount': 1, 'directions': new THREE.Vector3(0, 0, 0), 'size': 50, 'map': downloader.get('pow'), 'lifetime': 60, 'blending': THREE.NormalBlending }).spawn(other.worldposition);
     } else if (other instanceof l3.objects.Asteroid) {
         if (networker.isHost === true || networker.token === undefined) {
             other.collide(this);

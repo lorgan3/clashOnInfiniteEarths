@@ -250,7 +250,7 @@ function gameStart() {
     if (networker.token === undefined) {
         hud.updateTargets(amount);
     } else {
-        hud.updateTargets(networker.peers);
+        hud.updateTargets(networker.peers.length);
     }
 
     // Clients
