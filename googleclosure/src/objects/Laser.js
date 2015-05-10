@@ -49,11 +49,12 @@ l3.objects.Laser = function(model, options) {
     this.pivot.add(trail);
 
     options = options || {};
+
     /**
      * Life time in seconds.
      * @type {number}
      */
-    this.lifetime = options.lifetime || 5;
+    this.lifetime = options.lifetime || 3;
 
     /**
      * Lifetime counter.
@@ -75,6 +76,15 @@ l3.objects.Laser.prototype.serialize = function() {
 
 /** @inheritDoc */
 l3.objects.Laser.prototype.deserialize = function(data) {
+};
+
+/** @inheritDoc */
+l3.objects.Laser.prototype.serializeQuick = function() {
+    return {};
+};
+
+/** @inheritDoc */
+l3.objects.Laser.prototype.deserializeQuick = function(data) {
 };
 
 /**
@@ -118,34 +128,15 @@ l3.objects.Laser.prototype.rotateAroundObjectAxis = function(object, axis, radia
 l3.objects.Laser.prototype.collide = function(other) {
     if (other instanceof l3.objects.Player && other !== this.owner) {
         objectHandler.remove(this);
-        objectHandler.remove(other);
+        if (networker.isHost === true || networker.token === undefined) {
+            objectHandler.remove(other);
+        }
         particleHandler.add({ 'amount': 1, 'directions': new THREE.Vector3(0, 0, 0), 'size': 50, 'map': downloader.get('pow'), 'lifetime': 60, 'blending': THREE.NormalBlending }).spawn(other.worldposition);
     } else if (other instanceof l3.objects.Asteroid) {
-        downloader.get('crush').play();
-        var system = particleHandler.add({ 'amount': 150, 'position': other.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3 * other.size, 'map': downloader.get('particle'), 'lifetime': 60 });
-        system.active = false;
-
-        // Camera shake effect
-        if (myself !== undefined) {
-            var dist = players[myself].worldposition.distanceTo(other.worldposition);
-            if (dist <= 10) {
-                cameraHelper.shake(0.4, (11-dist)*15);
-            }
+        if (networker.isHost === true || networker.token === undefined) {
+            other.collide(this);
         }
-
-        // Spawn more asteroids.
-        if (other.size > 0.5)
-        for (var i=0; i<2; i++) {
-            var asteroid = l3.init.PlayerFactory.Asteroid(new THREE.Vector3(0, 0, other.model.position.z - 0.5), other.model.scale.x / 2, 'asteroid2');
-            asteroid.size = other.size / 2;
-            asteroid.pivot2.matrix.copy(other.pivot2.matrix);
-            asteroid.pivot2.rotation.setFromRotationMatrix(asteroid.pivot2.matrix);
-            asteroid.pivot.rotation.y = other.pivot.rotation.y;
-            asteroid.rotateAroundObjectAxis(asteroid.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(asteroid.pivot.rotation), (Math.PI/2 + i*Math.PI));
-        }
-
         objectHandler.remove(this);
-        objectHandler.remove(other);
     }
 };
 

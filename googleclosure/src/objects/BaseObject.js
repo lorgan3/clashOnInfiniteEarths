@@ -25,8 +25,20 @@ l3.objects.BaseObject.prototype.serialize = function() {};
 l3.objects.BaseObject.prototype.deserialize = function(data) {};
 
 /**
+ * A function that returns a json object with all values that should be synced for a quick update.
+ * @return {Object} A json object containing all values that should be synced.
+ */
+l3.objects.BaseObject.prototype.serializeQuick = function() {};
+
+/**
+ * A function that deserializes the data from the serializeQuick method.
+ * @param  {Object} data A json object containing all values that should be synced.
+ */
+l3.objects.BaseObject.prototype.deserializeQuick = function(data) {};
+
+/**
  * A handler that gets executed when this object collides with another.
- * @param  {l3.objects.BaseObject} other The other object.
+ * @param  {l3.objects.BaseObject=} other The other object.
  */
 l3.objects.BaseObject.prototype.collide = function(other) {};
 

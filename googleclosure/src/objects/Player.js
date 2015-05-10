@@ -39,6 +39,12 @@ l3.objects.Player = function(model, stateMachine, options) {
     this.attack = false;
 
     /**
+     * The ability that the player has currently selected.
+     * @type {number}
+     */
+    this.ability = 1;
+
+    /**
      * A value that determines how much the orbit changes.
      * @type {number}
      */
@@ -55,6 +61,12 @@ l3.objects.Player = function(model, stateMachine, options) {
      * @type {number}
      */
     this.size = 1.4;
+
+    /**
+     * The player is dead is falling towards the earth.
+     * @type {boolean}
+     */
+    this.dead = false;
 
     // Set up pivots to aid with the orbit.
     this.pivot = new THREE.Object3D();
@@ -98,13 +110,26 @@ l3.objects.Player.prototype.deserialize = function(data) {
     this.hp = data['h'];
 };
 
+/** @inheritDoc */
+l3.objects.Player.prototype.serializeQuick = function() {
+    return { 'r': this.pivot.rotation.y,
+             'd': new Float32Array(this.pivot2.matrix.elements)
+           };
+};
+
+/** @inheritDoc */
+l3.objects.Player.prototype.deserializeQuick = function(data) {
+    this.pivot.rotation.y = data['r'];
+    this.pivot2.matrix.elements = new Float32Array(data['d']);
+    this.pivot2.rotation.setFromRotationMatrix(this.pivot2.matrix);
+};
+
 /**
  * Serializes the player input state.
  */
 l3.objects.Player.prototype.serializeState = function() {
-    return { 'm': this.move,
-             'x': this.rotation,
-             'a': this.attack
+    return { 'x': this.rotation,
+             'a': this.attack === true ? this.ability : 4
            };
 };
 
@@ -113,9 +138,9 @@ l3.objects.Player.prototype.serializeState = function() {
  * @param {Object} data The state data.
  */
 l3.objects.Player.prototype.deserializeState = function(data) {
-    this.move = data['m'];
     this.rotation = data['x'];
-    this.attack = data['a'];
+    this.attack = data['a'] !== 4 ? true : false;
+    this.ability = data['a'];
 };
 
 /** @inheritDoc */
@@ -131,29 +156,77 @@ l3.objects.Player.prototype.update = function(delta) {
         this.reticle.position.setFromMatrixPosition(this.model.matrixWorld);
     }
 
-    // Set the speed and move the player in orbit.
-    this.speed = Math.max(0.25, this.speed - 1 * delta);
-    this.pivot.rotation.y = (this.pivot.rotation.y + this.speed*delta) % (Math.PI*2);
+    if (this.dead === false) {
+        // Set the speed and move the player in orbit.
+        this.speed = Math.max(0.25, this.speed - 1 * delta);
+        this.pivot.rotation.y = (this.pivot.rotation.y + this.speed*delta) % (Math.PI*2);
 
-    // Change orbit.
-    if (this.rotation !== 0) {
-        this.rotation = Math.max(-3, Math.min(3, this.rotation));
-        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), this.rotation * delta * 0.5);
+        // Change orbit.
+        if (this.rotation !== 0) {
+            this.rotation = Math.max(-3, Math.min(3, this.rotation));
+            this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), this.rotation * delta * 0.5);
+        }
+
+        // Speed up.
+        if (this.move === true) {
+            this.speed = Math.min(1, this.speed + 2 * delta);
+        }
+
+        if (this.attack === true) {
+            this.attack = false;
+            switch(this.ability) {
+                case 0:
+                    this.stateMachine.triggerState('laser');
+                break;
+                case 1:
+                    this.stateMachine.triggerState('punch');
+                break;
+                case 2:
+                    this.stateMachine.triggerState('speed');
+                break;
+            }
+        }
+
+        // Collide with asteroids
+        var target = collisionHelper.hit(this.worldposition, 1, this)[0];
+        if (target !== undefined && (networker.isHost === true || networker.token === undefined)) {
+            this.collide(target);
+        }
+    } else {
+        this.pivot.rotation.y = (this.pivot.rotation.y - 0.4*delta) % (Math.PI*2);
+        this.model.position.z -= 0.3 * delta;
+
+        if (networker.isHost === true || networker.token === undefined) {
+            if (this.model.position.z < world.orbit - 2.25) {
+                networker.broadcast({ 'a': l3.main.Networking.States.PLAYER_REMOVE, 'i': players.indexOf(this) });
+
+                var peerplayers = [];
+                for (var i in networker.peers) {
+                    if (networker.peers[i].peerId !== undefined) {
+                        peerplayers[i] = players[networker.peers[i].peerId];
+                    }
+                }
+
+                var myPlayer = players[myself];
+                objectHandler.remove(this);
+                myself = players.indexOf(myPlayer);
+                if (myself === -1) {
+                    myself = undefined;
+                    cameraHelper.setUp();
+                }
+
+                // Setup peer ids properly again.
+                for (var i in peerplayers) {
+                    var id = players.indexOf(peerplayers[i]);
+                    if (id === -1) {
+                        networker.peers[i].peerId = undefined;
+                    } else {
+                        networker.peers[i].peerId = id;
+                    }
+                }
+            }
+        }
     }
-
-    // Speed up.
-    if (this.move === true) {
-        this.speed = Math.min(1, this.speed + 2 * delta);
-    }
-
-    if (this.attack === true) {
-        this.attack = false;
-        this.stateMachine.triggerState('punch');
-    }
-
-    // Collide with asteroids
-    var target = collisionHelper.hit(this.worldposition, 1, this)[0];
-    this.collide(target);
 };
 
 /**
@@ -172,13 +245,20 @@ l3.objects.Player.prototype.rotateAroundObjectAxis = function(object, axis, radi
 
 /** @inheritDoc */
 l3.objects.Player.prototype.collide = function(other) {
-    if (other instanceof l3.objects.Asteroid) {
-        console.log(other);
-        alert('YOU');
-        alert('YES YOU');
-        alert('YOU ARE DEAD');
+    if (other instanceof l3.objects.Asteroid || other === undefined) {
+        if (networker.isHost === true) {
+            networker.broadcast({ 'a': l3.main.Networking.States.PLAYER_DIE, 'i': players.indexOf(this) });
+        }
 
-        objectHandler.remove(other);
+        if (networker.token !== undefined) {
+            hud.updateTargets();
+        }
+
+        downloader.get('scream').play();
+        this.stateMachine.triggerState('getHit');
+        this.dead = true;
+        var system = particleHandler.add({ 'amount': 50, 'position': this.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3, 'map': downloader.get('particle'), 'lifetime': 60, 'color': 0xff0000 });
+        system.active = false;
     }
 };
 

@@ -29,6 +29,7 @@ l3.objects.Asteroid = function(model, options) {
     this.pivot = new THREE.Object3D();
     this.pivot2 = new THREE.Object3D();
     this.pivot2.add(this.pivot);
+    this.pivot2.isSprite = true;
     this.pivot.add(this.model);
 
     /**
@@ -36,12 +37,32 @@ l3.objects.Asteroid = function(model, options) {
      * @type {Object}
      */
     this.worldposition = new THREE.Vector3(0, 0, 0);
+
+    /**
+     * Current velocity.
+     * @type {number}
+     */
+    this.speed = options.speed || 0.18;
+
+    /**
+     * Maximum velocity
+     * @type {number}
+     */
+    this.maxSpeed = options.maxSpeed || 0.6;
+
+    /**
+     * Should this astroid broadcast its creation next frame.
+     * @type {boolean}
+     */
+    this.shouldSync = false;
 };
 
 /** @inheritDoc */
 l3.objects.Asteroid.prototype.serialize = function() {
     return { 'r': this.pivot.rotation.y,
-             'd': new Float32Array(this.pivot2.matrix.elements)
+             'd': new Float32Array(this.pivot2.matrix.elements),
+             's': this.size,
+             'o': this.model.position.z
            };
 };
 
@@ -50,6 +71,24 @@ l3.objects.Asteroid.prototype.deserialize = function(data) {
     this.pivot.rotation.y = data['r'];
     this.pivot2.matrix.elements = new Float32Array(data['d']);
     this.pivot2.rotation.setFromRotationMatrix(this.pivot2.matrix);
+    this.size = data['s'];
+    this.model.position.z = data['o'];
+
+    var scale = this.size * 7.5 * particleFactor;
+    this.model.scale.set(scale, scale, scale);
+};
+
+/** @inheritDoc */
+l3.objects.Asteroid.prototype.serializeQuick = function() {
+    return { 'r': this.pivot.rotation.y,
+             's': this.speed
+           };
+};
+
+/** @inheritDoc */
+l3.objects.Asteroid.prototype.deserializeQuick = function(data) {
+    this.pivot.rotation.y = data['r'];
+    this.speed = data['s'];
 };
 
 /**
@@ -61,11 +100,20 @@ l3.objects.Asteroid.prototype.update = function(delta) {
     this.worldposition.setFromMatrixPosition(this.model.matrixWorld);
 
     // Move the asteroid.
-    this.pivot.rotation.y = (this.pivot.rotation.y + 0.25*delta) % (Math.PI*2);
+    this.pivot.rotation.y = (this.pivot.rotation.y + this.speed*delta) % (Math.PI*2);
 
-    this.model.rotation.z = (this.model.rotation.y + 3 * delta) % (Math.PI*2);
+    if (this.speed < this.maxSpeed) {
+        this.speed += 0.0033 * delta / this.size;
+    } else {
+        this.speed = this.maxSpeed;
+    }
 
-    this.hitCooldown = Math.max(0, this.hitCooldown - delta);
+    if (this.shouldSync === true) {
+        // Because threeJS calculates the worldmatrix 1 frame after creating an object, the full update has to be sent now.
+        this.shouldSync = false;
+        networker.broadcast({ 'a': l3.main.Networking.States.ASTEROID_SPAWN, 'd': this.serialize() });
+        console.log('yes');
+    }
 };
 
 /**
@@ -84,32 +132,50 @@ l3.objects.Asteroid.prototype.rotateAroundObjectAxis = function(object, axis, ra
 
 /** @inheritDoc */
 l3.objects.Asteroid.prototype.collide = function(other) {
-    if (this.hitCooldown === 0) {
-        this.hitCooldown = 0.6;
-        var i, j = 0, min = this.worldposition.x - other.worldposition.x;
-        if (this.worldposition.y - other.worldposition.y < min) {
-            min = this.worldposition.y - other.worldposition.y;
-            j = 1;
-        }
-        if (this.worldposition.z - other.worldposition.z < min) {
-            min = this.worldposition.z - other.worldposition.z;
-            j = 2;
-        }
-        var pos1 = new THREE.Vector3().copy(this.worldposition), pos2 = new THREE.Vector3().copy(other.worldposition);
-        pos1.setComponent(j, 0);
-        pos1.normalize();
-        pos2.setComponent(j, 0);
-        pos2.normalize();
-        var angle = pos1.angleTo(pos2);
-        console.log(angle);
-        console.log(pos1);
-        console.log(pos2);
-        this.rotateAroundObjectAxis(this.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(this.pivot.rotation), angle * 100);
+    if (networker.isHost === true) {
+        networker.broadcast({ 'a': l3.main.Networking.States.ASTEROID_DIE, 'i': asteroids.indexOf(this) });
     }
+
+    downloader.get('crush').play();
+    var system = particleHandler.add({ 'amount': 150, 'position': this.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3 * this.size, 'map': downloader.get('particle'), 'lifetime': 60 });
+    system.active = false;
+
+    // Camera shake effect
+    if (myself !== undefined) {
+        var dist = players[myself].worldposition.distanceTo(this.worldposition);
+        if (dist <= 10) {
+            cameraHelper.shake(0.4, (11-dist)*15);
+        }
+    }
+
+    // Spawn more asteroids.
+    if (this.size > 0.5 && (networker.isHost === true || networker.token === undefined)) {
+        for (var i=0; i<2; i++) {
+            // If this was a punch, only spawn 1 asteroid.
+            if (other instanceof l3.objects.Player) {
+                i = 1;
+            }
+
+            var asteroid = l3.init.PlayerFactory.Asteroid(new THREE.Vector3(0, 0, this.model.position.z - 0.5), this.model.scale.x / 2, 'asteroid2');
+            asteroid.size = this.size / 2;
+            asteroid.pivot2.matrix.copy(this.pivot2.matrix);
+            asteroid.pivot2.rotation.setFromRotationMatrix(this.pivot2.matrix);
+            asteroid.pivot.rotation.y = this.pivot.rotation.y;
+            asteroid.rotateAroundObjectAxis(asteroid.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(asteroid.pivot.rotation), (Math.PI/2 + i*Math.PI));
+            asteroid.shouldSync = true;
+        }
+    }
+
+    // Big asteroids count as targets.
+    if (this.size === 2 && networker.token === undefined) {
+        hud.updateTargets();
+    }
+
+    objectHandler.remove(this);
 };
 
 /** @inheritDoc */
 l3.objects.Asteroid.prototype.destroy = function() {
-    scene.remove(this.pivot2);
+    world.remove(this.pivot2);
     delete this.model;
 };
