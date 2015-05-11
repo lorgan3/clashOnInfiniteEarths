@@ -4,5 +4,42 @@
 </ol>
 
 <div class="container">
-	<p>Scores go here</p>
+    <div>
+        <h3>Your scores</h3>
+        <dl>
+            <dt>Quickest singleplayer win</dt>
+            <dt>{{ scores.quickestRound }}</dt>
+
+            <dt>Total asteroids destroyed</dt>
+            <dt>{{ scores.asteroidsKilled }}</dt>
+
+            <dt>Most asteroids destroyed in 1 round</dt>
+            <dt>{{ scores.asteroidsKilled1Round }}</dt>
+
+            <dt>Earths saved (singleplayer)</dt>
+            <dt>{{ scores.singleplayerWins }}</dt>
+
+            <dt>Earths saved (multiplayer)</dt>
+            <dt>{{ scores.multiplayerWins }}</dt>
+
+            <dt>Enemy heroes killed</dt>
+            <dt>{{ scores.playersKilled }}</dt>
+        </dl>
+    </div>
+
+    <div>
+        <h3>Highscores</h3>
+        <table>
+            <tr >
+                <th>Name</th>
+                <th>SinglePlayer</th>
+                <th>MultiPlayer</th>
+            </tr>
+            <tr ng-repeat="score in highscores">
+                <td>{{ score.name }}</td>
+                <td>{{ score.singleplayerWins }}</td>
+                <td>{{ score.multiplayerWins }}</td>
+            </tr>
+        </table>
+    </div>
 </div>

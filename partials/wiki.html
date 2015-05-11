@@ -3,6 +3,8 @@
     <li class="active">Wiki</li>
 </ol>
 
-<div class="container">
-	<p>Wiki goes here</p>
+<div class="container" ng-include="template">
+</div>
+<div ng-show="template === undefined ? true : false">
+	DEFAULT
 </div>

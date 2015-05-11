@@ -1,12 +1,36 @@
 var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angular-carousel'])
 
-.run(function($rootScope, ngDialog, Players) {
+.run(function($rootScope, ngDialog, Players, Scores) {
     $rootScope.user = undefined;
+    $rootScope.events = [];
+
+    /**
+     * Waits for the player to be logged in before executing the given function.
+     * @param {Function} e The function to execute.
+     */
+    $rootScope.withPlayer = function(e) {
+        if (this.user === undefined) {
+            this.events.push(e);
+        } else {
+            e();
+        }
+    }
 
     // Log in if the user has a token cookie.
     if (getCookie('token') !== '') {
         Players.sendToken({}, function(data) {
             $rootScope.user = {id: data.id, name: data.name, joindate: data.joindate};
+
+            // Launch all functions that required the player object.
+            for(var i in $rootScope.events) {
+                $rootScope.events[i]();
+            }
+            $rootScope.events.length = 0;
+        }, function(data) {
+            console.log(data);
+            alert('failure');
+            var prefixes = ['incredible', 'amazing', 'invincible', 'unstoppable', 'mighty', 'super', 'mega', 'awesome'];
+            $rootScope.user = {id: undefined, name: 'the' + prefixes[Math.floor(Math.random()*prefixes.length)] + 'player', joindate: undefined };
         });
     }
 
@@ -33,7 +57,7 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angula
      * @return {boolean} True if the user is signed in.
      */
     $rootScope.signedIn = function() {
-        return this.user !== undefined;
+        return this.user !== undefined && this.user.id !== undefined;
     };
 
     /**
@@ -73,6 +97,10 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angula
         });
     };
 
+    $rootScope.getUserId = function() {
+        return this.user.id;
+    }
+
     /**
      * Opens the host modal box.
      */
@@ -108,6 +136,16 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angula
         this.user = undefined;
         setCookie('token', undefined, -1);
     };
+
+    // Updates the scores in the API.
+    $rootScope.sendScore = function() {
+        Scores.update({time: -1, playersKilled: 0, asteroidsKilled: 0, won: true, singleplayer: true}, function(data) {
+            console.log(data);
+        });
+    };
+
+    // Expose this function so the game can use it.
+    app.sendScore = $rootScope.sendScore;
 })
 
 .constant('apiKey', 'JaTQVBvA-FdfP6542-jzeTXp4R-HtSQHCHm-ckJUY9HD')

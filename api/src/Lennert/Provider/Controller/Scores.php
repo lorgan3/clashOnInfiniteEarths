@@ -14,22 +14,50 @@ class Scores extends CustomController {
         $controllers = $app['controllers_factory'];
 
         $controllers
-            ->get('/{id}/', array($this, 'peopleDetail'))
-            ->assert('id', '\d+')
+            ->get('/', array($this, 'highscores'))
             ->before(array($this, 'validateApiKey'));
+
+        $controllers
+            ->get('/{id}/', array($this, 'scores'))
+            ->assert('id', '\d+')
+            ->before(array($this, 'validateApiKey'))
+            ->before(array($this, 'authorise'));
+
+        $controllers
+            ->put('/', array($this, 'putScores'))
+            ->before(array($this, 'validateApiKey'))
+            ->before(array($this, 'authorise'));
 
         return $controllers;
 
     }
 
-    public function peopleDetail(Application $app, $id) {
-        $response = new \Bramus\Http\RestResponse();
-        //$people = $app['db.people']->details($id, $app);
-        //if ($people == false) {
-            $response->setStatus(404);
-        //} else {
-        //  $response->setContent($people);
-        //}
-        return $response->finish();
+    public function highscores(Application $app) {
+        return $this->ok($app['db.scores']->pagedHighscores(isset($_GET['p']) ? $_GET['p'] : 0));
+    }
+
+    public function scores(Application $app, $id) {
+        if ($app['user']['id'] != $id) {
+            $response = new \Bramus\Http\RestResponse();
+            $response->setStatus(403);
+            $response->setContent("You can only view your own scores.");
+            return $response->finish();
+        }
+
+        return $this->ok($app['db.scores']->scores($id));
+    }
+
+    public function putScores(Application $app) {
+        $result = $this->validateInput(array('time' => '/^-?\\d+$/', 'playersKilled' => '/^\\d+$/', 'asteroidsKilled' => '/^\\d+$/', 'won' => '/^\\d$/', 'singleplayer' => '/^\\d$/'));
+        if (!is_array($result)) {
+            return $result;
+        }
+        return $this->ok($app['db.scores']->updateScores(
+            $result['time'],
+            $result['playersKilled'],
+            $result['asteroidsKilled'],
+            $result['won'] == 1 ? true : false,
+            $result['singleplayer'] == 1 ? true : false,
+            $app['user']) ? 'Success' : 'Failure');
     }
 }

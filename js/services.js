@@ -47,5 +47,28 @@ var app = angular.module('l3game')
             headers: { 'X-Api-Key': apiKey, 'auth-token': getCookie('token') }
         }
     });
+})
+
+.factory('Scores', function($resource, apiPath, apiKey) {
+    // A hack with the 2 backslashes so the regular slash doesn't get stripped. The api requires routes with a slash.
+    return $resource(apiPath + '/scores\\/', {}, {
+        query: {
+            method: 'GET',
+            isArray: true,
+            transformResponse: function(data) { return angular.fromJson(data).content; },
+            headers: { 'X-Api-Key': apiKey }
+        },
+        get: {
+            method: 'GET',
+            url: apiPath + '/scores/:id\\/',
+            transformResponse: function(data) { return angular.fromJson(data).content; },
+            headers: { 'X-Api-Key': apiKey, 'auth-token': getCookie('token') }
+        },
+        update: {
+            method: 'PUT',
+            transformResponse: function(data) { return angular.fromJson(data).content; },
+            headers: { 'X-Api-Key': apiKey, 'auth-token': getCookie('token') }
+        }
+    });
 });
 

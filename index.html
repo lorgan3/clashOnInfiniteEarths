@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/angular-carousel.min.css">
 </head>
 <body data-ng-app="l3game" ng-style="!showHeader() ? {overflow: 'hidden'} : {}">
-    <div ng-class="showHeader() ? 'wrapper' : ''">
+        <div class="wrapper" ng-class="!showHeader() ? 'unwrap' : ''">
         <div class="comic-border" ng-show="showHeader()">
             <header ng-show="showHeader()">
                 <div class="page-header">
@@ -34,7 +34,7 @@
             </header>
         </div>
         <div class="comic-background">
-            <div data-ng-view=""></div>
+            <div data-ng-view="" class="h-padded"></div>
 
             <!-- Angular base -->
             <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>

@@ -3,10 +3,23 @@ var app = angular.module('l3game')
 .controller('homeCtrl', function($scope) {
 })
 
-.controller('scoresCtrl', function($scope) {
+.controller('scoresCtrl', function($scope, $rootScope, Scores) {
+    // Loads the score data.
+    $scope.loadData = function() {
+        Scores.get({'id': $rootScope.user.id}, function(data) {
+            $rootScope.scores = data;
+        });
+
+        var highscores = Scores.query(function(data) {
+            $rootScope.highscores = data;
+        });
+    };
+
+    $rootScope.withPlayer($scope.loadData);
 })
 
 .controller('wikiCtrl', function($scope) {
+    $scope.template = 'partials/wiki/controls.html';
 })
 
 .controller('gameCtrl', function($scope, $rootScope, Games, $routeParams, ngDialog) {
