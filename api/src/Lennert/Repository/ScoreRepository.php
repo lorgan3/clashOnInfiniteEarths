@@ -55,7 +55,7 @@ class ScoreRepository extends LinkedRepository {
         }
 
         return $this->db->update('Players',
-            array('quickestRound' => $time > 0 ? ($oldTime !== null ? (min($oldTime, $time)) : $time) : $oldTime,
+            array('quickestRound' => ($time > 0 && $singleplayer) ? ($oldTime !== null ? (min($oldTime, $time)) : $time) : $oldTime,
                 'playersKilled' => $data['playersKilled'] + $playersKilled,
                 'asteroidsKilled' => $data['asteroidsKilled'] + $asteroidsKilled,
                 'asteroidsKilled1Round' => max($data['asteroidsKilled1Round'], $asteroidsKilled),
