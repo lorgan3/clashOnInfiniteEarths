@@ -2,6 +2,12 @@ var Audio = {
     "play": function() {}
 }
 
+var Howl = {
+    "play": function() {},
+    "pos3d": function() {},
+    "volume": function() {}
+}
+
 var Stats = {
     "domElement" : {},
     "setMode" : function () {}
@@ -434,7 +440,9 @@ var THREE = {
     "Sprite": function () {},
     "Particle": function () {},
     "LensFlare": function () {},
-    "Scene": function () {},
+    "Scene": {
+        "updateMatrixWorld": function() {}
+    },
     "Fog": function () {},
     "FogExp2": function () {},
     "ShaderChunk": {

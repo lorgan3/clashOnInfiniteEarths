@@ -74,7 +74,8 @@ l3.init.Downloader.prototype.loadImage = function(name, url) {
  * @param  {string} url  path to download from.
  */
 l3.init.Downloader.prototype.loadSound = function(name, url) {
-	this.models[name] = new Audio(url);
+	//this.models[name] = new Audio(url);
+	this.models[name] = new Howl({ 'urls': [url] });
 };
 
 /**

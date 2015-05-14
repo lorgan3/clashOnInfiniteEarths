@@ -263,25 +263,48 @@ l3.objects.Player.prototype.rotateAroundObjectAxis = function(object, axis, radi
 
 /** @inheritDoc */
 l3.objects.Player.prototype.collide = function(other) {
-    if (networker.isHost === true) {
-        networker.broadcast({ 'a': l3.main.Networking.States.PLAYER_DIE, 'i': players.indexOf(this) });
+    if (networker.isHost === true || networker.token === undefined) {
+        var source = -1;
+        if (other instanceof l3.objects.Player) {
+            source = players.indexOf(other);
+        }
+
+        if (source === myself) {
+            classSelect.playersKilled++;
+        }
+        networker.broadcast({ 'a': l3.main.Networking.States.PLAYER_DIE, 'i': players.indexOf(this), 's': source });
     }
 
-    if (networker.token !== undefined) {
-        hud.updateTargets();
+    var snd = downloader.get('scream').play();
+    if (myself !== undefined) {
+        var dist = this.worldposition.distanceTo(players[myself].worldposition);
+        if (dist < 20) {
+            snd.volume((20-dist)/20);
+        }
     }
-
-    downloader.get('scream').play();
     this.stateMachine.triggerState('getHit');
     this.dead = true;
     var system = particleHandler.add({ 'amount': 50, 'position': this.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3, 'map': downloader.get('particle'), 'lifetime': 60, 'color': 0xff0000 });
     system.active = false;
+
+    if (networker.token !== undefined) {
+        hud.updateTargets();
+    }
 };
 
 /** @inheritDoc */
 l3.objects.Player.prototype.destroy = function() {
     if (this.dead === true && (networker.isHost || networker.token === undefined)) {
-        window.setTimeout(showClassSelect, 2000);
+        // Lose on singleplayer
+        if (players.length <= 1 && networker.token === undefined) {
+            classSelect.won = false;
+        }
+
+        window.setTimeout(function() {
+            if (classSelect.won !== undefined) {
+                showClassSelect()
+            }
+        }, 2000);
     }
 
     scene.remove(this.pivot2);
@@ -303,7 +326,13 @@ l3.objects.Player.prototype.stun = function() {
     if (networker.isHost === true) {
         networker.broadcast({ 'a': l3.main.Networking.States.PLAYER_STUN, 'i': players.indexOf(this) });
     }
-    downloader.get('stun').play();
+    var snd = downloader.get('stun').play();
+    if (myself !== undefined) {
+        var dist = this.worldposition.distanceTo(players[myself].worldposition);
+        if (dist < 20) {
+            snd.volume((20-dist)/20);
+        }
+    }
     var system = particleHandler.add({ 'amount': 50, 'position': this.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3, 'map': downloader.get('particle'), 'lifetime': 60, 'color': 0xff0000 });
     system.active = false;
     this.stunned = 3;

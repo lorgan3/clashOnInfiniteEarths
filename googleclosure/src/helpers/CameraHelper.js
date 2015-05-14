@@ -133,4 +133,7 @@ l3.helpers.CameraHelper.prototype.update = function(delta) {
 l3.helpers.CameraHelper.prototype.shake = function(time, intensity) {
     this.time += time;
     this.intensity = intensity || 100;
+
+    //Also vibrate using the html5 vibration api.
+    window.navigator['vibrate'](this.intensity * 1.5);
 };

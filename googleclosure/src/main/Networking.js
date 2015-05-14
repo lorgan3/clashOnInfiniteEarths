@@ -67,10 +67,6 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
         this.peer.name = playerName;
         this.peer.kills = 0;
         this.peer.deaths = 0;
-        classSelect.addPlayer(this.peer);
-    } else {
-        // Single player
-        classSelect.addPlayer({name: playerName, kills: 0, deaths: 0});
     }
 };
 
@@ -102,7 +98,6 @@ l3.main.Networking.prototype.addListeners = function(connection) {
 
     connection.on('close', function() {
         if (self.isHost === true) {
-            classSelect.removePlayer(connection);
             var index = self.peers.indexOf(connection);
             self.peers.splice(index, 1);
             connection.close();
@@ -130,6 +125,7 @@ l3.main.Networking.prototype.addListeners = function(connection) {
         if (self.connected === false) {
             self.connected = true;
             self.connection.send({'a': l3.main.Networking.States.HELLO, 'n': self.peer.name});
+            classSelect.show();
             panel.hide();
         }
 
@@ -142,7 +138,6 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 case l3.main.Networking.States.HELLO:
                     // Receive the name from the client.
                     connection.name = data['n'];
-                    classSelect.addPlayer({name: connection.name, kills: connection.kills, deaths: connection.deaths});
                 break;
             }
         } else {
@@ -159,6 +154,10 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                     // Receive all data to setup a game.
                     self.receiveFullUpdate(data);
 
+                    if (players.length !== 0) {
+                        classSelect.hide();
+                    }
+
                     if (data['i'] !== undefined && data['i'] !== null) {
                         myself = data['i'];
                     } else {
@@ -173,6 +172,10 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 case l3.main.Networking.States.PLAYER_DIE:
                     // kill a player.
                     players[data['i']].collide();
+
+                    if (data['s'] === myself) {
+                        classSelect.playersKilled++;
+                    }
                 break;
                 case l3.main.Networking.States.PLAYER_REMOVE:
                     // Actually remove the player
@@ -201,6 +204,9 @@ l3.main.Networking.prototype.addListeners = function(connection) {
                 case l3.main.Networking.States.ASTEROID_DIE:
                     // Kill an asteroid.
                     asteroids[data['i']].collide();
+                    if (data['s'] === myself) {
+                        classSelect.asteroidsKilled++;
+                    }
                 break;
             }
         }

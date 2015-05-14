@@ -32,13 +32,24 @@ l3.main.Control = function(game) {
             self.pointerX = e.beta;
             self.pointerY = e.gamma;
         });
+    } else {
+        game.addEventListener('touchmove', function(e) {
+            self.pointerX +=  (e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0) % 50;
+            self.pointerY += (e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0) % 50;
+        });
     }
 
     // Select a new ability on mobile devices.
     hud.panel.addEventListener('touchstart', function(e) {
-        if (e.target !== undefined) {
-            hud.select(e.target.index);
-            self.clicks[l3.main.Control.Mouse.RIGHT] = true;
+        if (e.target !== undefined && e.target.index !== undefined) {
+            if (e.target.index === -1) {
+                hud.select();
+            } else if (e.target.index === -2) {
+                self.clicks[l3.main.Control.Mouse.RIGHT] = true;
+            } else {
+                hud.select(e.target.index);
+                self.clicks[l3.main.Control.Mouse.RIGHT] = true;
+            }
         }
 
         e.preventDefault();
@@ -46,10 +57,7 @@ l3.main.Control = function(game) {
         return false;
     });
     hud.panel.addEventListener('touchend', function(e) {
-        if (e.target !== undefined) {
-            hud.select(e.target.index);
-            self.clicks[l3.main.Control.Mouse.RIGHT] = false;
-        }
+        self.clicks[l3.main.Control.Mouse.RIGHT] = false;
 
         e.preventDefault();
         e.stopPropagation();
@@ -60,22 +68,6 @@ l3.main.Control = function(game) {
     document.addEventListener('wheel', function(e) {
         hud.select(hud.selected + (e.wheelDelta < 0 ? 1 : -1));
     });
-
-    // Execute ability on mobile.
-    /*hud.triggerArea.addEventListener('touchstart', function(e) {
-        self.clicks[l3.main.Control.Mouse.RIGHT] = true;
-
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    });
-    hud.triggerArea.addEventListener('touchend', function(e) {
-        self.clicks[l3.main.Control.Mouse.RIGHT] = false;
-
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    });*/
 
     // Execute ability on desktop.
     game.addEventListener('mousedown', function(e) {

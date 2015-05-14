@@ -49,9 +49,13 @@ class ScoreRepository extends LinkedRepository {
      */
     public function updateScores($time, $playersKilled, $asteroidsKilled, $won, $singleplayer, $user) {
         $data = $this->db->fetchAssoc('SELECT id, name, quickestRound, playersKilled, asteroidsKilled, asteroidsKilled1Round, multiplayerWins, singleplayerWins, singleplayerTries, multiplayerTries FROM Players WHERE id = ?', array($user['id']));
+        $oldTime = $data['quickestRound'];
+        if ($won === false) {
+            $time = -1;
+        }
 
         return $this->db->update('Players',
-            array('quickestRound' => $time != -1 ? min($data['quickestRound'], $time) : null,
+            array('quickestRound' => $time > 0 ? ($oldTime !== null ? (min($oldTime, $time)) : $time) : $oldTime,
                 'playersKilled' => $data['playersKilled'] + $playersKilled,
                 'asteroidsKilled' => $data['asteroidsKilled'] + $asteroidsKilled,
                 'asteroidsKilled1Round' => max($data['asteroidsKilled1Round'], $asteroidsKilled),

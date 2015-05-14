@@ -81,7 +81,8 @@ l3.objects.Asteroid.prototype.deserialize = function(data) {
 /** @inheritDoc */
 l3.objects.Asteroid.prototype.serializeQuick = function() {
     return { 'r': this.pivot.rotation.y,
-             's': this.speed
+             's': this.speed,
+             'd': new Float32Array(this.pivot2.matrix.elements)
            };
 };
 
@@ -89,6 +90,8 @@ l3.objects.Asteroid.prototype.serializeQuick = function() {
 l3.objects.Asteroid.prototype.deserializeQuick = function(data) {
     this.pivot.rotation.y = data['r'];
     this.speed = data['s'];
+    this.pivot2.matrix.elements = new Float32Array(data['d']);
+    this.pivot2.rotation.setFromRotationMatrix(this.pivot2.matrix);
 };
 
 /**
@@ -131,11 +134,22 @@ l3.objects.Asteroid.prototype.rotateAroundObjectAxis = function(object, axis, ra
 
 /** @inheritDoc */
 l3.objects.Asteroid.prototype.collide = function(other) {
-    if (networker.isHost === true) {
-        networker.broadcast({ 'a': l3.main.Networking.States.ASTEROID_DIE, 'i': asteroids.indexOf(this) });
+    if (networker.isHost === true || networker.token === undefined) {
+        var source = -1;
+        if (other instanceof l3.objects.Player) {
+            source = players.indexOf(other);
+        } else if (other instanceof l3.objects.Laser) {
+            source = players.indexOf(other.owner);
+        }
+
+        if (source === myself) {
+            classSelect.asteroidsKilled++;
+        }
+
+        networker.broadcast({ 'a': l3.main.Networking.States.ASTEROID_DIE, 'i': asteroids.indexOf(this), 's': source });
     }
 
-    downloader.get('crush').play();
+    var snd = downloader.get('crush').play();
     var system = particleHandler.add({ 'amount': 150, 'position': this.worldposition, 'directions': new THREE.Vector3(0.15, 0.15, 0.15), 'size': 3 * this.size, 'map': downloader.get('particle'), 'lifetime': 60 });
     system.active = false;
 
@@ -144,6 +158,9 @@ l3.objects.Asteroid.prototype.collide = function(other) {
         var dist = players[myself].worldposition.distanceTo(this.worldposition);
         if (dist <= 10) {
             cameraHelper.shake(0.4, (11-dist)*15);
+        }
+        if (dist <= 20) {
+            snd.volume((20-dist)/20);
         }
     }
 

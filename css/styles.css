@@ -87,9 +87,9 @@ table {
 
 /** Menu button for mobile devices */
 #menubutton {
-    font-size: 1.5em;
     position: absolute;
     padding: 20px;
+    margin-left: 5%;
     cursor: pointer;
     background: url('../img/menu.png') no-repeat center;
 }

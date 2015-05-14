@@ -30,7 +30,13 @@ l3.init.PlayerFactory.Wizard = function(position) {
             hud.regenerate();
         }
         model.animations[2].play();
-        downloader.get('swing').play();
+        var snd = downloader.get('swing').play();
+        if (myself !== undefined) {
+            var dist = player.worldposition.distanceTo(players[myself].worldposition);
+            if (dist < 20) {
+                snd.volume((20-dist)/20);
+            }
+        }
         animationListener.on(model.animations[2], 0.3, function(e) {
             var target = collisionHelper.hit(player.worldposition, 2, player)[0];
             if (target !== undefined) {
@@ -38,7 +44,13 @@ l3.init.PlayerFactory.Wizard = function(position) {
                     if (networker.isHost === true || networker.token === undefined) {
                         target.collide(player);
                     }
-                    downloader.get('punch').play();
+                    var snd = downloader.get('punch').play();
+                    if (myself !== undefined) {
+                        var dist = player.worldposition.distanceTo(players[myself].worldposition);
+                        if (dist < 20) {
+                            snd.volume((20-dist)/20);
+                        }
+                    }
                     particleHandler.add({ 'amount': 1, 'directions': new THREE.Vector3(0, 0, 0), 'size': 50, 'map': downloader.get('pow'), 'lifetime': 60, 'blending': THREE.NormalBlending }).spawn(target.worldposition);
                 }
             }

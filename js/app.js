@@ -27,11 +27,22 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angula
             }
             $rootScope.events.length = 0;
         }, function(data) {
-            console.log(data);
-            alert('failure');
             var prefixes = ['incredible', 'amazing', 'invincible', 'unstoppable', 'mighty', 'super', 'mega', 'awesome'];
             $rootScope.user = {id: undefined, name: 'the' + prefixes[Math.floor(Math.random()*prefixes.length)] + 'player', joindate: undefined };
+
+            // Launch all functions that required the player object.
+            for(var i in $rootScope.events) {
+                $rootScope.events[i]();
+            }
         });
+    } else {
+        var prefixes = ['incredible', 'amazing', 'invincible', 'unstoppable', 'mighty', 'super', 'mega', 'awesome'];
+        $rootScope.user = {id: undefined, name: 'the' + prefixes[Math.floor(Math.random()*prefixes.length)] + 'player', joindate: undefined };
+
+        // Launch all functions that required the player object.
+        for(var i in $rootScope.events) {
+            $rootScope.events[i]();
+        };
     }
 
     /**
@@ -105,17 +116,21 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angula
      * Opens the host modal box.
      */
     $rootScope.host = function() {
-        ngDialog.open({
-            template: 'partials/modals/host.html',
-            controller: 'modalCtrl',
-            data: {code: 'host', modelname: 'server', model: {
-                servername: getCookie('servername') || 'My Server',
-                maxplayers: Number(getCookie('maxplayers')) || 4,
-                'private': Boolean(Number(getCookie('private'))) || false,
-                peerserver: getCookie('peerserver'),
-                peerport: Number(getCookie('peerserverport')) || 9000}
-            }
-        });
+        if ($rootScope.user.id === undefined) {
+            this.showSignIn();
+        } else {
+            ngDialog.open({
+                template: 'partials/modals/host.html',
+                controller: 'modalCtrl',
+                data: {code: 'host', modelname: 'server', model: {
+                    servername: getCookie('servername') || 'My Server',
+                    maxplayers: Number(getCookie('maxplayers')) || 4,
+                    'private': Boolean(Number(getCookie('private'))) || false,
+                    peerserver: getCookie('peerserver'),
+                    peerport: Number(getCookie('peerserverport')) || 9000}
+                }
+            });
+        }
     }
 
     /**
@@ -138,8 +153,13 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angula
     };
 
     // Updates the scores in the API.
-    $rootScope.sendScore = function() {
-        Scores.update({time: -1, playersKilled: 0, asteroidsKilled: 0, won: true, singleplayer: true}, function(data) {
+    $rootScope.sendScore = function(time, playersKilled, asteroidsKilled, won, singleplayer) {
+        Scores.update({time: time,
+                       playersKilled: playersKilled,
+                       asteroidsKilled: asteroidsKilled,
+                       won: won,
+                       singleplayer: singleplayer},
+        function(data) {
             console.log(data);
         });
     };

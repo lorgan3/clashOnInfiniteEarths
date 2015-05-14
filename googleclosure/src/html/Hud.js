@@ -157,13 +157,18 @@ l3.html.Hud.prototype.updateTargets = function(targets) {
     }
     this.panel.targets.textContent = this.targets + '/' + this.maxTargets;
 
-    if (this.targets === 0) {
-        if (players.length > 0 && players[myself] === players[0]) {
-            classSelect.won = true;
-            classSelect.show();
+    if (this.targets === 0 && classSelect.won === undefined) {
+        if (networker.token === undefined) {
+            classSelect.won = (players.length > 0);
         } else {
             classSelect.won = false;
-            classSelect.show();
+            for (var i in players) {
+                if (players[i].dead === false && Number(i) === myself) {
+                    classSelect.won = true;
+                    break;
+                }
+            }
         }
+        classSelect.show();
     }
 };

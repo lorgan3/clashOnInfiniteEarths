@@ -6,9 +6,22 @@ var app = angular.module('l3game')
 .controller('scoresCtrl', function($scope, $rootScope, Scores) {
     // Loads the score data.
     $scope.loadData = function() {
-        Scores.get({'id': $rootScope.user.id}, function(data) {
-            $rootScope.scores = data;
-        });
+        if ($rootScope.user.id !== undefined) {
+            Scores.get({'id': $rootScope.user.id}, function(data) {
+                if (data['quickestRound'] !== null) {
+                    var minutes = Math.floor((data['quickestRound'] / 60) % 60);
+                    var seconds = Math.floor(data['quickestRound'] % 60);
+
+                    data['quickestRound'] = (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds  < 10 ? '0' + seconds : seconds);
+                } else {
+                    data['quickestRound'] = 'N/A';
+                }
+
+                $rootScope.scores = data;
+            });
+        } else {
+            $rootScope.scores = {'quickestRound' : '/', 'asteroidsKilled' : '/', 'asteroidsKilled1Round': '/', 'singleplayerWins' : '/', 'multiplayerWins' : '/', 'playersKilled' : '/' };
+        }
 
         var highscores = Scores.query(function(data) {
             $rootScope.highscores = data;
@@ -31,13 +44,14 @@ var app = angular.module('l3game')
 
         // Keep the server in the list.
         if ($rootScope['private'] === false) {
-            setInterval(function() {
+            var updateFn = function() {
                 if (isVisible() === true) {
                     Games.update({token: $rootScope.token, players: getPlayers()}, function(data) {
-                        // Do nothing
+                        setTimeout(updateFn, 10000);
                     });
                 }
-            }, 10000);
+            }
+            updateFn();
         }
 
         // Remove the server from the list
@@ -98,7 +112,7 @@ var app = angular.module('l3game')
             setCookie('peerserverport', this.server.peerport, 365);
             $rootScope.peerserver = this.server.peerserver;
             $rootScope.peerserverport = this.server.peerport;
-            $rootScope.serverName = $rootScope.token;
+            $rootScope.servername = $rootScope.token;
             $scope.launch();
             this.close();
         };
@@ -149,6 +163,7 @@ var app = angular.module('l3game')
         Players.signIn({username: this.user.username, password: this.user.password}, function(data) {
             setCookie('token', data.token, self.user.rememberme === true ? 365 : 0);
             $rootScope.user = {id: data.id, name: data.name, joindate: data.joindate};
+            location.reload(); // The services don't have access to this cookie for some reason.
         });
 
         this.close();
@@ -207,7 +222,7 @@ var app = angular.module('l3game')
         $rootScope.peerserver = server.peerServer;
         $rootScope.peerserverport = server.peerPort;
         $rootScope.isHost = false;
-        $rootScope.servername = server.servername;
+        $rootScope.servername = server.name;
 
         $location.path('/play/' + server.key);
 

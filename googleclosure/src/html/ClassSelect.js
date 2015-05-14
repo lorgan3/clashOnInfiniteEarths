@@ -52,7 +52,7 @@ l3.html.ClassSelect = function(container, isHost, serverName) {
         this.panel.backButton = document.createElement('a');
         this.panel.backButton.className = 'btn btn-default';
         this.panel.backButton.onclick = function() {
-            if (players.length === 0 || (players.length === 1 && networker.token !== undefined)) {
+            if (players.length === 0 || classSelect.won !== undefined) {
                 gameEnd();
                 gameStart();
                 classSelect.hide();

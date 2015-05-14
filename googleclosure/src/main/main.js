@@ -83,8 +83,8 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport, server
     var container = document.getElementById('container');
     panel = new l3.html.Panel(container);
     hud = new l3.html.Hud(container);
-    classSelect = new l3.html.ClassSelect(container, (isHost || token === undefined), serverName);
     networker = new l3.main.Networking(isHost, token, maxplayers, peerserver, peerserverport, playerName);
+    classSelect = new l3.html.ClassSelect(container, (isHost || token === undefined), serverName);
     animationListener = new l3.helpers.AnimationListener();
     objectHandler = new l3.helpers.ObjectHandler();
     cameraHelper = new l3.helpers.CameraHelper(camera);
@@ -212,12 +212,6 @@ function render() {
     webGLRenderer.render(scene2, camera);
 
     stats.update();
-    if (time === 0) {
-        // Because threeJS calculates the worldmatrix 1 frame after creating an object, the full update has to be sent now.
-        for (var i in networker.peers) {
-            networker.sendFullUpdate(networker.peers[i]);
-        }
-    }
     time += delta;
 }
 
@@ -239,7 +233,7 @@ function gameStart() {
     myself = 0;
     cameraHelper.setUp();
 
-    var amount = networker.token === undefined ? 20 : 5;
+    var amount = networker.token === undefined ? 15 : 5;
     for (var i=0; i<amount; i++) {
         var asteroid = l3.init.PlayerFactory.Asteroid(new THREE.Vector3(0, 0, world.orbit));
         asteroid.pivot2.rotation.x = Math.random()*Math.PI*2;
@@ -260,6 +254,33 @@ function gameStart() {
         player.pivot2.updateMatrix();
 
         networker.peers[i].peerId = players.indexOf(player);
+    }
+
+    // Make sure no one collides
+    do {
+        scene.updateMatrixWorld();
+        for (var i in objectHandler.objects) {
+            objectHandler.objects[i].worldposition.setFromMatrixPosition(objectHandler.objects[i].model.matrixWorld);
+        }
+
+        var badasteroids = [];
+        for (var i in asteroids) {
+            for (var j in players) {
+                if (players[j].worldposition.distanceTo(asteroids[i].worldposition) < 6) {
+                    badasteroids.push(asteroids[i]);
+                }
+            }
+        }
+
+        for (var i in badasteroids) {
+            badasteroids[i].pivot2.rotation.x = Math.random()*Math.PI*2;
+            badasteroids[i].pivot2.rotation.y = Math.random()*Math.PI*2;
+            badasteroids[i].pivot2.rotation.z = Math.random()*Math.PI*2;
+        }
+    } while(badasteroids.length !== 0);
+
+    for (var i in networker.peers) {
+        networker.sendFullUpdate(networker.peers[i]);
     }
 }
 
@@ -286,6 +307,11 @@ function gameEnd() {
             networker.peers[i].peerId = undefined;
         }
     }
+
+    // Reset scores
+    classSelect.playersKilled = 0;
+    classSelect.asteroidsKilled = 0;
+    classSelect.won = undefined;
 }
 
 /**
