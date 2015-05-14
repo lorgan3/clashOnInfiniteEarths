@@ -7,7 +7,7 @@ html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
 del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
+small, strike, sub, sup, tt, var,
 b, u, i, center,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
@@ -29,7 +29,7 @@ footer, header, hgroup, menu, nav, section {
     display: block;
 }
 body {
-    line-height: 1;
+    line-height: 1.1;
 }
 ol, ul {
     list-style: none;
@@ -68,7 +68,6 @@ table {
     background: url('../img/comicBg.png');
     background-size: 15px;
 }
-
 .panel .panel-body {
     margin-bottom: 10px;
 }
@@ -77,19 +76,27 @@ table {
     border-radius: 5px;
     margin-top: 10px;
 }
-
 .panel .progress .progress-bar {
     height: 15px;
     background: #FFE685;
     border-radius: 5px;
 }
-
+.panel .tutorial, .panel .status-message {
+    line-height: 1.2;
+    background: #f9f9f9;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.panel .status-message:empty {
+    display: none;
+}
 
 /** Menu button for mobile devices */
 #menubutton {
     position: absolute;
     padding: 20px;
-    margin-left: 5%;
+    margin-top: 5px;
     cursor: pointer;
     background: url('../img/menu.png') no-repeat center;
 }
@@ -236,11 +243,11 @@ header {
     margin: 5px 5px 5px 0;
 }
 .col-md-2 {
-    width: 620px;
+    width: 617px;
     margin: 5px 10px 5px 0;
 }
 
-.col-md-3.smaller {
+.col-md-3.smaller, .col-md-3.small {
     margin-right: 0;
 }
 
@@ -339,7 +346,7 @@ small {
 
 .hud > div.toggle {
     position: fixed;
-    top: 0;
+    top: 50px;
     bottom: 0;
     left: 0;
     width: 7%;
@@ -356,7 +363,7 @@ small {
 
 /** Breadcrumb */
 .breadcrumb {
-    padding: 10px 0 20px 0;
+    padding: 10px 0;
 }
 .breadcrumb li {
     display: inline;
@@ -366,7 +373,7 @@ small {
 }
 
 /** Definition list with your scores */
-dl {
+dl.half {
     float: left;
     width: 278px;
 }
@@ -380,6 +387,15 @@ dt {
 
 dd {
     padding: 5px;
+}
+
+/** List style */
+ul.spaced {
+    list-style: initial;
+    margin-left: 20px;
+}
+ul.spaced > li {
+    padding: 5px 0;
 }
 
 /** Highscore table */
@@ -413,7 +429,7 @@ table tr:nth-child(odd) {
 
 .center {
     display: inline-block;
-    margin: 0 20px;
+    margin: 0 18px;
 }
 
 .h-padded {
@@ -475,33 +491,10 @@ table tr:nth-child(odd) {
     background-image: url('../img/multi-host.png'), url('../img/space.png');
 }
 
-.player-table tr {
-    height: 25px;
-    line-height: 25px;
-}
-
-.player-table tr:nth-child(even) {
-    background: #f5f5f5;
-}
-
-.player-table tr th {
-    text-align: left;
-}
-
-.player-table tr td:first-child, .player-table tr th:first-child {
-    width: 60%;
-}
-
-.tutorial, .status-message {
-    line-height: 1.2;
-    background: #f9f9f9;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-.status-message:empty {
-    display: none;
+/** Specific */
+#pc-controls {
+    float: left;
+    min-height: 510px;
 }
 
 @-webkit-keyframes ngdialog-flyin {
