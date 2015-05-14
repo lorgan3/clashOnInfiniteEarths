@@ -32,12 +32,12 @@ l3.main.Control = function(game) {
             self.pointerX = e.beta;
             self.pointerY = e.gamma;
         });
-    } else {
-        game.addEventListener('touchmove', function(e) {
-            self.pointerX +=  (e['movementX'] || e['mozMovementX'] || e['webkitMovementX'] || 0) % 50;
-            self.pointerY += (e['movementY'] || e['mozMovementY'] || e['webkitMovementY'] || 0) % 50;
-        });
     }
+
+    game.addEventListener('touchmove', function(e) {
+        self.pointerX = (e.pageX - window.innerWidth/2)/80;
+        self.pointerY = (e.pageY - window.innerHeight/2)/80;
+    });
 
     // Select a new ability on mobile devices.
     hud.panel.addEventListener('touchstart', function(e) {
@@ -133,11 +133,11 @@ l3.main.Control = function(game) {
         if (e.keyCode === 9) {
             classSelect.hide();
         } else if (e.keyCode === 49) {
-            hud.select(1);
+            hud.select(0);
         } else if (e.keyCode === 50) {
-            hud.select(2);
+            hud.select(1);
         } else if (e.keyCode === 51) {
-            hud.select(3);
+            hud.select(2);
         }
     });
 };
@@ -161,5 +161,5 @@ l3.main.Control.prototype.update = function() {
     }
 
     // The rotation is set when the game sends a quick update.
-    players[myself].attack = this.clicks[l3.main.Control.Mouse.RIGHT] || this.clicks[l3.main.Control.Mouse.LEFT];
+    players[myself].attack = this.clicks[l3.main.Control.Mouse.RIGHT] /*|| this.clicks[l3.main.Control.Mouse.LEFT]*/;
 };
