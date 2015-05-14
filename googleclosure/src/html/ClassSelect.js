@@ -29,26 +29,37 @@ l3.html.ClassSelect = function(container, isHost, serverName) {
     this.panel.headTitle = document.createElement('h3');
     this.panel.headTitle.className = 'panel-title';
 
-    if (serverName !== undefined) {
-        serverName = 'Server: ' + serverName;
+    if (networker.token !== undefined) {
+        serverName = 'Server' + (serverName !== undefined ? ': '+ serverName : '');
     } else {
         serverName = 'Single player';
     }
     this.panel.headTitle.appendChild(document.createTextNode(serverName));
     this.panel.body = document.createElement('div');
     this.panel.body.className = 'panel-body';
-    this.makeTable();
+
     this.panel.message = document.createElement('div');
+
+    this.panel.tutorial = document.createElement('p');
+    this.panel.tutorial.appendChild(document.createTextNode('Eliminate all targets by punching or shooting them!\nUse your speed boost to get out of dangerous situations and be wary of your cooldowns.\nAlso keep an eye on the clock because the asteroids won\'t keep going slow!'));
+    this.panel.tutorial.className = 'tutorial';
+
+    this.panel.statusMessage = document.createElement('p');
+    this.panel.statusMessage.className = 'status-message';
+    this.panel.message.appendChild(this.panel.statusMessage);
 
     if (isHost === true) {
         this.panel.backButton = document.createElement('a');
         this.panel.backButton.className = 'btn btn-default';
         this.panel.backButton.onclick = function() {
-            gameEnd();
-            gameStart();
-            classSelect.hide();
-            classSelect.hideMessage();
-            pointerLockHelper.lock(game);
+            if (players.length === 0 || (players.length === 1 && networker.token !== undefined)) {
+                gameEnd();
+                gameStart();
+                classSelect.hide();
+                classSelect.hideMessage();
+                pointerLockHelper.lock(game);
+                classSelect.panel.statusMessage.textContent = '';
+            }
         };
         this.panel.backButton.textContent = 'start game';
         this.panel.backButton.style.display = 'inline-block';
@@ -59,7 +70,7 @@ l3.html.ClassSelect = function(container, isHost, serverName) {
         this.panel.message.appendChild(this.panel.hostMessage);
     }
 
-    this.panel.body.appendChild(this.panel.playerTable);
+    this.panel.body.appendChild(this.panel.tutorial);
     this.panel.body.appendChild(this.panel.message);
     this.panel.head.appendChild(this.panel.headTitle);
     this.panel.appendChild(this.panel.head);
@@ -71,6 +82,24 @@ l3.html.ClassSelect = function(container, isHost, serverName) {
      * @type {boolean}
      */
     this.hidden = true;
+
+    /**
+     * The amount of players you killed.
+     * @type {number}
+     */
+    this.playersKilled = 0;
+
+    /**
+     * The amount of asteroids you destroyed.
+     * @type {number}
+     */
+    this.asteroidsKilled = 0;
+
+    /**
+     * Did you win the round?
+     * @type {boolean|undefined}
+     */
+    this.won = undefined;
 };
 
 /**
@@ -80,9 +109,20 @@ l3.html.ClassSelect.prototype.show = function() {
     this.panel.style.display = 'block';
     this.hidden = false;
 
-    if (players.length === 0) {
+    if (/*(players.length === 1 && networker.token !== undefined) || players.length === 0*/this.won !== undefined) {
         pointerLockHelper.unlock();
         this.showMessage();
+
+        this.panel.statusMessage.textContent = '';
+        if (this.won !== undefined) {
+            this.panel.statusMessage.appendChild(document.createTextNode('You ' + (this.won ? 'won' : 'lost') + '!'));
+            //if (players.length === 1 && this.won !== true) {
+            //    this.panel.statusMessage.appendChild(document.createTextNode(player.name + ' won the game.'));
+            //}
+
+            // Exposed ajax call for updating the score.
+            window['app']['sendScore'](Math.round(time-2), this.playersKilled, this.asteroidsKilled, this.won ? 1 : 0, (networker.token === undefined) ? 1 : 0);
+        }
     }
 };
 
@@ -106,113 +146,4 @@ l3.html.ClassSelect.prototype.showMessage = function() {
  */
 l3.html.ClassSelect.prototype.hideMessage = function() {
     this.panel.message.style.display = 'none';
-};
-
-/**
- * Redraws the playertable.
- */
-l3.html.ClassSelect.prototype.update = function() {
-    this.panel.body.removeChild(this.panel.playerTable);
-    this.makeTable();
-    this.panel.body.appendChild(this.panel.playerTable);
-};
-
-/**
- * Adds a player to the scoreboard.
- * @param {Object} player The player to add.
- */
-l3.html.ClassSelect.prototype.addPlayer = function(player) {
-    var i = this.panel.playerTable.players.length;
-    var row = document.createElement('tr');
-    this.panel.playerTable.players[i] = [];
-    for(var j in this.headers) {
-        var col = document.createElement('td');
-        col.appendChild(document.createTextNode(player[this.headers[j]]));
-        row.appendChild(col);
-        this.panel.playerTable.players[i][this.headers[j]] = col;
-    }
-    this.panel.playerTable.appendChild(row);
-};
-
-/**
- * Removes a player from the scoreboard.
- * @param {Object} player The player to remove.
- */
-l3.html.ClassSelect.prototype.removePlayer = function(player) {
-    var row = this.findPlayer(player);
-    if (row !== undefined) {
-        this.panel.playerTable.removeChild(this.panel.playerTable.players[row][this.headers[0]].parentNode);
-        delete this.panel.playerTable.players[row];
-    }
-};
-
-/**
- * Updates the columns in a player row.
- * @param {Object} player The player.
- * @param {Object} values The new values.
- */
-l3.html.ClassSelect.prototype.updatePlayer = function(player, values) {
-    var row = this.findPlayer(player);
-    if (row !== undefined) {
-        var element = this.panel.playerTable.players[row];
-        for (var j in this.headers) {
-            if (values[this.headers[j]] !== undefined) {
-                player[this.headers[j]] = values[this.headers[j]];
-                element[this.headers[j]].innerHTML = '';
-                element[this.headers[j]].appendChild(document.createTextNode(values[this.headers[j]]));
-            }
-        }
-    }
-}
-
-/**
- * Looks for a player in the playertable.
- * @param  {Object}           player The player object.
- * @return {number|undefined}        The index
- */
-l3.html.ClassSelect.prototype.findPlayer = function(player) {
-    for (var i in this.panel.playerTable.players) {
-        var found = true;
-        for (var j in this.headers) {
-            if (this.panel.playerTable.players[i][this.headers[j]].textContent !== String(player[this.headers[j]])) {
-                found = false;
-                break;
-            }
-        }
-
-        if (found === true) {
-            return Number(i);
-        }
-    }
-    return undefined;
-};
-
-/**
- * Generates the html for the playertable.
- */
-l3.html.ClassSelect.prototype.makeTable = function() {
-    this.panel.playerTable = document.createElement('table');
-    this.panel.playerTable.className = 'player-table';
-    this.panel.playerTable.players = [];
-
-    var row = document.createElement('tr');
-    for(var i in this.headers) {
-        var col = document.createElement('th');
-        col.appendChild(document.createTextNode(this.headers[i]));
-        row.appendChild(col);
-    }
-    this.panel.playerTable.appendChild(row);
-
-    /*var playerData = [{name:'player1', kills:'1', deaths:'0'}, {name:'player2', kills:'0', deaths:'1'}];
-    for(var i in playerData) {
-        row = document.createElement('tr');
-        this.panel.playerTable.players[+i] = [];
-        for(var j in headers) {
-            var col = document.createElement('td');
-            col.appendChild(document.createTextNode(playerData[i][headers[j]]));
-            row.appendChild(col);
-            this.panel.playerTable.players[+i][headers[j]] = col;
-        }
-        this.panel.playerTable.appendChild(row);
-    }*/
 };

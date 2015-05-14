@@ -64,7 +64,11 @@ table {
 /** Panel in the middle of the gamescreen for connection info */
 .panel {
     box-sizing: border-box;
+
+    background: url('../img/comicBg.png');
+    background-size: 15px;
 }
+
 .panel .panel-body {
     margin-bottom: 10px;
 }
@@ -122,7 +126,7 @@ nav ul, nav ul li {
     background-color: #FFE685;
     color: #333;
     background-blend-mode: multiply;
-    background-size: 10px;
+    background-size: 15px;
     padding: 3px;
     text-decoration: none;
     text-align: center;
@@ -209,7 +213,7 @@ header {
     height: 140px;
 }
 
-.col-md-3, .col-md-1 {
+.col-md-3, .col-md-1, .col-md-2 {
     border: 2px solid #333;
     width: 301px;
     padding: 10px;
@@ -218,6 +222,8 @@ header {
     margin-top: 5px;
     display: inline-block;
     box-sizing: border-box;
+    background-image: url('../img/comicBg.png');
+    background-size: 15px;
 }
 
 .col-md-3 .btn {
@@ -228,6 +234,14 @@ header {
 .col-md-1 {
     width: 934px;
     margin: 5px 5px 5px 0;
+}
+.col-md-2 {
+    width: 620px;
+    margin: 5px 10px 5px 0;
+}
+
+.col-md-3.smaller {
+    margin-right: 0;
 }
 
 .form-group label {
@@ -323,6 +337,23 @@ small {
     transition: width 3s, margin-left 3s;
 }
 
+.hud > div.toggle {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 7%;
+}
+
+.hud > div.activate {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 7%;
+}
+
+
 /** Breadcrumb */
 .breadcrumb {
     padding: 10px 0 20px 0;
@@ -332,6 +363,57 @@ small {
 }
 .breadcrumb li:not(:last-child):after {
     content: ' / ';
+}
+
+/** Definition list with your scores */
+dl {
+    float: left;
+    width: 278px;
+}
+
+dt {
+    background: #FFE685;
+    padding: 5px;
+    margin: 0 3px;
+    font-weight: bold;
+}
+
+dd {
+    padding: 5px;
+}
+
+/** Highscore table */
+table {
+    width: 100%;
+    text-align: left;
+}
+table tr:first-child {
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+}
+table tr {
+    height: 25px;
+    line-height: 25px;
+}
+table tr:nth-child(odd) {
+    background-color: #FFE685;
+}
+
+.fit {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+.row {
+    position: relative;
+}
+
+.center {
+    display: inline-block;
+    margin: 0 20px;
 }
 
 .h-padded {
@@ -355,12 +437,12 @@ small {
     color: #333;
     margin: 3px;
     padding: 7px;
-    transition: background 0.4s;
+    transition: background 0.2s;
 }
 
 .list-group-item:hover:not(.disabled) {
-    background: #ccc;
-    border-radius: 10px;
+    background: #FFE685;
+    opacity: 0.6;
 }
 
 .player-table {
@@ -408,6 +490,18 @@ small {
 
 .player-table tr td:first-child, .player-table tr th:first-child {
     width: 60%;
+}
+
+.tutorial, .status-message {
+    line-height: 1.2;
+    background: #f9f9f9;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.status-message:empty {
+    display: none;
 }
 
 @-webkit-keyframes ngdialog-flyin {
@@ -626,8 +720,16 @@ small {
         margin-left: 50px;
     }
 
-    .col-md-1 {
+    .col-md-1, .col-md-2 {
         width: 301px !important;
+    }
+
+    .smaller {
+        display: none;
+    }
+
+    .center {
+        margin: 0;
     }
 
     .carousel {
@@ -681,6 +783,10 @@ small {
 
     .col-md-3.bigger {
         width: 620px !important;
+    }
+
+    .smaller {
+        display: none;
     }
 
     .ngdialog.ngdialog-theme-default .ngdialog-content, .panel {

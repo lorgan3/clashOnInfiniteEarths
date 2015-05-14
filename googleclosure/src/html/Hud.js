@@ -38,11 +38,21 @@ l3.html.Hud = function(container) {
     this.panel.targets.className = 'targets';
     this.panel.targets.textContent = '0/0';
 
+    this.panel.toggle = document.createElement('div');
+    this.panel.toggle.className = 'toggle';
+    this.panel.toggle.index = -1;
+
+    this.panel.activate = document.createElement('div');
+    this.panel.activate.className = 'activate';
+    this.panel.activate.index = -2;
+
     this.panel.appendChild(this.panel.time);
     this.panel.appendChild(this.panel.laser);
     this.panel.appendChild(this.panel.punch);
     this.panel.appendChild(this.panel.speed);
     this.panel.appendChild(this.panel.targets);
+    this.panel.appendChild(this.panel.toggle);
+    this.panel.appendChild(this.panel.activate);
     container.appendChild(this.panel);
 
     /**
@@ -148,6 +158,12 @@ l3.html.Hud.prototype.updateTargets = function(targets) {
     this.panel.targets.textContent = this.targets + '/' + this.maxTargets;
 
     if (this.targets === 0) {
-        alert('YOU WIN');
+        if (players.length > 0 && players[myself] === players[0]) {
+            classSelect.won = true;
+            classSelect.show();
+        } else {
+            classSelect.won = false;
+            classSelect.show();
+        }
     }
 };

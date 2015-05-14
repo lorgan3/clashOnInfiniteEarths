@@ -34,7 +34,7 @@
             </header>
         </div>
         <div class="comic-background">
-            <div data-ng-view="" class="h-padded"></div>
+            <div data-ng-view="" ng-class="showHeader() ? 'h-padded' : ''"></div>
 
             <!-- Angular base -->
             <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
@@ -51,6 +51,7 @@
 
             <!-- Code for the game -->
             <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.26/howler.min.js"></script>
             <script type="text/javascript" src="js/peer.min.js"></script>
             <script type="text/javascript" src="js/stats.min.js"></script>
             <script type="text/javascript" src="js/build.js"></script>

@@ -4,42 +4,52 @@
 </ol>
 
 <div class="container">
-    <div>
-        <h3>Your scores</h3>
-        <dl>
-            <dt>Quickest singleplayer win</dt>
-            <dt>{{ scores.quickestRound }}</dt>
+    <div class="row">
+        <div class="col-md-2">
+            <h3>Your scores</h3>
+            <div class="center">
+                <dl>
+                    <dt>Quickest singleplayer win</dt>
+                    <dd>{{ scores.quickestRound }}</dd>
 
-            <dt>Total asteroids destroyed</dt>
-            <dt>{{ scores.asteroidsKilled }}</dt>
+                    <dt>Total asteroids destroyed</dt>
+                    <dd>{{ scores.asteroidsKilled }}</dd>
 
-            <dt>Most asteroids destroyed in 1 round</dt>
-            <dt>{{ scores.asteroidsKilled1Round }}</dt>
+                    <dt>Asteroids destroyed 1 round</dt>
+                    <dd>{{ scores.asteroidsKilled1Round }}</dd>
+                </dl><dl>
+                    <dt>Earths saved (singleplayer)</dt>
+                    <dd>{{ scores.singleplayerWins }}</dd>
 
-            <dt>Earths saved (singleplayer)</dt>
-            <dt>{{ scores.singleplayerWins }}</dt>
+                    <dt>Earths saved (multiplayer)</dt>
+                    <dd>{{ scores.multiplayerWins }}</dd>
 
-            <dt>Earths saved (multiplayer)</dt>
-            <dt>{{ scores.multiplayerWins }}</dt>
-
-            <dt>Enemy heroes killed</dt>
-            <dt>{{ scores.playersKilled }}</dt>
-        </dl>
+                    <dt>Enemy heroes killed</dt>
+                    <dd>{{ scores.playersKilled }}</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="col-md-3 smaller fit"></div>
     </div>
 
-    <div>
-        <h3>Highscores</h3>
-        <table>
-            <tr >
-                <th>Name</th>
-                <th>SinglePlayer</th>
-                <th>MultiPlayer</th>
-            </tr>
-            <tr ng-repeat="score in highscores">
-                <td>{{ score.name }}</td>
-                <td>{{ score.singleplayerWins }}</td>
-                <td>{{ score.multiplayerWins }}</td>
-            </tr>
-        </table>
+    <div class="row">
+        <div class="col-md-3 bigger">
+            <h3>Highscores</h3>
+            <table>
+                <tr >
+                    <th style="width: 10%">#</th>
+                    <th style="width: 44%">Name</th>
+                    <th style="width: 22%">Single</th>
+                    <th style="width: 22%">Multi</th>
+                </tr>
+                <tr ng-repeat="score in highscores">
+                    <td>{{ $index+1 }}</td>
+                    <td>{{ score.name }}</td>
+                    <td>{{ score.singleplayerWins }}</td>
+                    <td>{{ score.multiplayerWins }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-2 smaller fit"></div>
     </div>
 </div>
