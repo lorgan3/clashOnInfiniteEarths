@@ -60,7 +60,7 @@ l3.objects.Player = function(model, stateMachine, options) {
      * The size of this object (used for collisionchecking)
      * @type {number}
      */
-    this.size = 1.4;
+    this.size = 1.2;
 
     /**
      * The player is dead is falling towards the earth.
@@ -73,6 +73,20 @@ l3.objects.Player = function(model, stateMachine, options) {
     this.pivot2 = new THREE.Object3D();
     this.pivot2.add(this.pivot);
     this.pivot.add(this.model);
+
+    if (debug === true) {
+        var hitbox = new THREE.Mesh(new THREE.SphereGeometry(this.size), new THREE.MeshBasicMaterial({ 'color': 0x0000ff, 'wireframe': true }));
+        hitbox.position.z = model.position.z;
+        this.pivot.add(hitbox);
+
+        var hitbox2 = new THREE.Mesh(new THREE.SphereGeometry(0.5), new THREE.MeshBasicMaterial({ 'color': 0x00ff00, 'wireframe': true }));
+        hitbox2.position.z = model.position.z;
+        this.pivot.add(hitbox2);
+
+        var hitbox3 = new THREE.Mesh(new THREE.SphereGeometry(1.5), new THREE.MeshBasicMaterial({ 'color': 0xff0000, 'wireframe': true }));
+        hitbox3.position.z = model.position.z;
+        this.pivot.add(hitbox3);
+    }
 
     options = options || {};
     this.maxHp = options.maxHp || 100;
@@ -204,7 +218,7 @@ l3.objects.Player.prototype.update = function(delta) {
         }
 
         // Collide with asteroids
-        var target = collisionHelper.hit(this.worldposition, 1, this)[0];
+        var target = collisionHelper.hit(this.worldposition, 0.5, this)[0];
         if (target !== undefined && (networker.isHost === true || networker.token === undefined)) {
             if (target instanceof l3.objects.Asteroid === true) {
                 this.collide(target);

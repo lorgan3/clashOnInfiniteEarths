@@ -179,6 +179,12 @@ l3.objects.Asteroid.prototype.collide = function(other) {
             asteroid.pivot.rotation.y = this.pivot.rotation.y;
             asteroid.rotateAroundObjectAxis(asteroid.pivot2, new THREE.Vector3(0, 0, -1).applyEuler(asteroid.pivot.rotation), (Math.PI/2 + i*Math.PI));
             asteroid.shouldSync = true;
+
+            if (debug === true) {
+                var hitbox = new THREE.Mesh(new THREE.SphereGeometry(this.size/2), new THREE.MeshBasicMaterial({ 'color': 0x0000ff, 'wireframe': true }));
+                hitbox.position.z = asteroid.model.position.z;
+                asteroid.pivot.add(hitbox);
+            }
         }
     }
 

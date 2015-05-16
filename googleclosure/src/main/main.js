@@ -20,7 +20,6 @@ goog.require('l3.objects.Laser');
 /**
  * Show debug information?
  *
- * @const
  * @type {boolean}
  */
 var debug = false;
@@ -239,6 +238,12 @@ function gameStart() {
         asteroid.pivot2.rotation.x = Math.random()*Math.PI*2;
         asteroid.pivot2.rotation.y = Math.random()*Math.PI*2;
         asteroid.pivot2.rotation.z = Math.random()*Math.PI*2;
+
+        if (debug === true) {
+            var hitbox = new THREE.Mesh(new THREE.SphereGeometry(2), new THREE.MeshBasicMaterial({ 'color': 0x0000ff, 'wireframe': true }));
+            hitbox.position.z = world.orbit;
+            asteroid.pivot.add(hitbox);
+        }
     }
 
     if (networker.token === undefined) {
@@ -323,3 +328,17 @@ function showClassSelect() {
     }
 }
 window['showClassSelect'] = showClassSelect;
+
+function enableDebug() {
+    debug = true;
+    gameEnd();
+
+    for (var i = scene.children-1; i>=0; i--) {
+        scene.remove(scene.children[i]);
+    }
+    for (var i = scene2.children-1; i>=0; i--) {
+        scene2.remove(scene2.children[i]);
+    }
+    downloader.readyCallback();
+}
+window['debug'] = enableDebug;

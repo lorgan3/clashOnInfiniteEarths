@@ -38,7 +38,7 @@ l3.init.PlayerFactory.Wizard = function(position) {
             }
         }
         animationListener.on(model.animations[2], 0.3, function(e) {
-            var target = collisionHelper.hit(player.worldposition, 2, player)[0];
+            var target = collisionHelper.hit(player.worldposition, 1.5, player)[0];
             if (target !== undefined) {
                 if (target instanceof l3.objects.Player || target instanceof l3.objects.Asteroid) {
                     if (networker.isHost === true || networker.token === undefined) {
@@ -97,7 +97,7 @@ l3.init.PlayerFactory.Wizard = function(position) {
 
     // Show the player's orbit
     if (debug === true) {
-        var circleGeometry = new THREE.CircleGeometry(25, 32);
+        var circleGeometry = new THREE.CircleGeometry(position.z, 32);
         circleGeometry.vertices.shift(); // Remove the center vertex
         var circle = new THREE.Line( circleGeometry, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
         circle.rotation.x = Math.PI/2;

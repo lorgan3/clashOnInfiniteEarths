@@ -33,7 +33,7 @@ l3.helpers.CollisionHelper.prototype.hit = function(position, range, self, multi
             continue;
         }
 
-        if (other.worldposition.distanceTo(position) < (other.size/2 + range)) {
+        if (other.worldposition.distanceTo(position) < (other.size + range)) {
             matches.push(other);
             if (multi !== true) {
                 break;
