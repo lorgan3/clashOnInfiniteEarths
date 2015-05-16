@@ -96,7 +96,6 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport, server
     // Start the game once all materials and objects are download.
     downloader.readyCallback = function() {
         // The world everything revolves around.
-        //world = downloader.addClone('planet', new THREE.Vector3(0, 0, 0), new THREE.Euler(0, Math.PI/2, 0, 'XYZ'));
         downloader.get('planetSkin').mapping = THREE.SphericalReflectionMapping;
         world = new THREE.Mesh(new THREE.SphereGeometry(20, 32, 32), new THREE.MeshBasicMaterial({ 'map': downloader.get('planetSkin') }));
         world.orbit = 22;
@@ -131,7 +130,6 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport, server
 
     // create a render and set the size
     webGLRenderer = new THREE.WebGLRenderer();
-    //webGLRenderer.setClearColor(new THREE.Color(0x999999, 1.0));
     webGLRenderer.setSize(window.innerWidth, window.innerHeight);
     webGLRenderer.shadowMapEnabled = false;
     webGLRenderer.autoClear = false;
