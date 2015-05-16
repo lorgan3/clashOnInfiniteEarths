@@ -1,0 +1,18 @@
+{
+  "name": "wmd_1415_project2",
+  "version": "0.0.0",
+  "authors": [
+    "Lennert Claeys <lennert.claeys@student.odisee.be>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+  }
+}

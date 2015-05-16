@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
 
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/ngDialog.min.css">
-    <link rel="stylesheet" href="css/angular-carousel.min.css">
+    <link rel="stylesheet" href="vendor/ngDialog/css/ngDialog.min.css">
+    <link rel="stylesheet" href="vendor/angular-carousel/dist/angular-carousel.min.css">
 </head>
 <body data-ng-app="l3game" ng-style="!showHeader() ? {overflow: 'hidden'} : {}">
         <div class="wrapper" ng-class="!showHeader() ? 'unwrap' : ''">
@@ -35,12 +35,12 @@
             <div data-ng-view="" ng-class="showHeader() ? 'h-padded' : ''"></div>
 
             <!-- Angular base -->
-            <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
-            <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-route.min.js"></script>
-            <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-resource.min.js"></script>
-            <script type="text/javascript" src="js/ngDialog.min.js"></script>
-            <script type="text/javascript" src="js/angular-touch.min.js"></script>
-            <script type="text/javascript" src="js/angular-carousel.min.js"></script>
+            <script src="vendor/angular/angular.min.js"></script>
+            <script src="vendor/angular-route/angular-route.min.js"></script>
+            <script src="vendor/angular-resource/angular-resource.min.js"></script>
+            <script type="text/javascript" src="vendor/ngDialog/js/ngDialog.min.js"></script>
+            <script type="text/javascript" src="vendor/angular-touch/angular-touch.min.js"></script>
+            <script type="text/javascript" src="vendor/angular-carousel/dist/angular-carousel.min.js"></script>
 
             <!-- Code for the website -->
             <script type="text/javascript" src="js/app.js"></script>
@@ -48,10 +48,10 @@
             <script type="text/javascript" src="js/services.js"></script>
 
             <!-- Code for the game -->
-            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
-            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.26/howler.min.js"></script>
-            <script type="text/javascript" src="js/peer.min.js"></script>
-            <script type="text/javascript" src="js/stats.min.js"></script>
+            <script type="text/javascript" src="vendor/threejs/build/three.min.js"></script>
+            <script type="text/javascript" src="vendor/howler/howler.min.js"></script>
+            <script type="text/javascript" src="vendor/peerjs/peer.min.js"></script>
+            <script type="text/javascript" src="vendor/stats.js/build/stats.min.js"></script>
             <script type="text/javascript" src="js/build.js"></script>
         </div>
     </div>
