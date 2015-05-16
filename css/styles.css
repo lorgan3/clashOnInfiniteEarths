@@ -2,7 +2,6 @@
    v2.0 | 20110126
    License: none (public domain)
 */
-
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -46,6 +45,10 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
 }
+
+/*****************************
+ * Own styles
+ *****************************/
 
 /** Warning message while playing in portrait mode */
 #portraitwarning {
@@ -145,6 +148,7 @@ nav ul, nav ul li {
     font-family: verdana;
     line-height: 20px;
     cursor: pointer;
+    transition: 0.2s all;
 }
 
 .btn.active, .btn:hover, nav ul li.active a, nav ul li a:hover {
@@ -173,9 +177,17 @@ nav ul, nav ul li {
     color: #fff;
 }
 
-.navbar-text {
-    text-align: bottom;
+.navbar-right .username-text {
+    float: left;
+    padding-top: 5px;
+    padding-right: 5px;
+    max-width: 220px;
+    word-break: break-all;
+    height: 20px;
+    overflow: hidden;
+    text-align: center;
 }
+
 
 @font-face {
     font-family: comicFont;
@@ -186,7 +198,7 @@ body {
     background-image: url('../img/comicBg.png');
     background-blend-mode: multiply;
     background-size: 8px;
-    background-color: #E6F0FF;
+    background-color: #FFF8DA;
 }
 
 .wrapper:not(.unwrap) {
@@ -249,6 +261,20 @@ header {
 
 .col-md-3.smaller, .col-md-3.small {
     margin-right: 0;
+}
+
+.comic-splash {
+    background: url('../img/splash2.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    line-height: 190px;
+    text-align: center;
+    font-family: ComicFont;
+    font-size: 2.2em;
+    color: #FF8080;
+    transform: rotate(15deg);
+    text-shadow: 5px 1px #333;
 }
 
 .form-group label {
@@ -360,6 +386,24 @@ small {
     width: 7%;
 }
 
+.hud #laser {
+    background-image: url('../img/icons.png');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 300%;
+}
+.hud #punch {
+    background-image: url('../img/icons.png');
+    background-repeat: no-repeat;
+    background-position: -49px 0;
+    background-size: 300%;
+}
+.hud #speed {
+    background-image: url('../img/icons.png');
+    background-repeat: no-repeat;
+    background-position: -97px 0;
+    background-size: 300%;
+}
 
 /** Breadcrumb */
 .breadcrumb {
@@ -443,6 +487,11 @@ table tr:nth-child(odd) {
     padding: 10px;
 }
 
+.label {
+    color: #999;
+    font-size: small;
+}
+
 .list-group-item:not(:last-child) {
     box-shadow: 0 12px 15px -10px #aaa;
 }
@@ -497,6 +546,9 @@ table tr:nth-child(odd) {
     min-height: 510px;
 }
 
+/*****************************
+ * ng dialog
+ *****************************/
 @-webkit-keyframes ngdialog-flyin {
   0% {
     opacity: 0;
@@ -668,10 +720,6 @@ table tr:nth-child(odd) {
 .carousel {
     width: 930px;
     height: 400px;
-    background-color: #f0f0f0;
-    background: url('../img/comicBg.png');
-    background-blend-mode: multiply;
-    background-size: 10px;
 }
 
 .rn-carousel-control {
@@ -719,27 +767,35 @@ table tr:nth-child(odd) {
     margin-left: 0;
 }
 
+
 @media screen and (max-width: 645px) {
     .wrapper:not(.unwrap) {
         width: 326px;
     }
 
     header {
-        height: 365px;
-        background-size: 100% 365px;
+        height: 390px;
+        background-size: 100% 390px;
     }
 
     nav ul li {
-        margin: 0 35px 5px 35px;
+        margin: 0 45px 5px 45px;
     }
 
     .navbar-right {
         float: none;
         margin-left: 5px;
+        margin-right: 5px;
     }
 
-    .navbar-right > button {
-        margin-left: 50px;
+    .navbar-right .username-text {
+        max-width: 100%;
+        float: none;
+    }
+
+    .btn.small {
+        width: 150px;
+        margin: 5px 60px 5px 60px;
     }
 
     .col-md-1, .col-md-2 {
@@ -805,6 +861,10 @@ table tr:nth-child(odd) {
 
     .col-md-3.bigger {
         width: 620px !important;
+    }
+
+    .col-md-3.bigger .btn-red {
+        margin-left: 0;
     }
 
     .smaller {

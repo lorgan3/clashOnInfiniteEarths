@@ -23,12 +23,10 @@
                             <li ng-class="{active: isActive('/scores')}"><a href="#/scores">Highscores</a></li>
                             <li ng-class="{active: isActive('/wiki')}"><a href="#/wiki">Wiki</a></li>
                         </ul>
-                        <div class="navbar-right" ng-hide="signedIn()">
-                            <button class="btn btn-red navbar-btn" ng-click="showSignIn()">Sign in</button>
+                        <div class="navbar-right">
+                            <p class="username-text" ng-show="user.id">Signed in as {{ user.name }}</p>
+                            <button class="btn btn-red navbar-btn small" ng-click="showSignIn()">{{ !user.id ? "Sign in" : "Log out"}}</button>
                         </div>
-                        <p class="navbar-text navbar-right" ng-show="signedIn()">
-                            Signed in as {{ user.name }} <a ng-click="signOut()" class="btn btn-red small">logout</a>
-                        </p>
                     </div>
                 </nav>
             </header>

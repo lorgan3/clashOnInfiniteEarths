@@ -18,8 +18,11 @@ var app = angular.module('l3game')
                 }
 
                 $rootScope.scores = data;
+                var levels = ['Ok', 'Good', 'Nice', 'Great', 'Awesome', 'Amazing', 'Unstoppable', 'Epic', 'God-Like'];
+                $rootScope.performance = levels[Math.floor(Math.min(9, data['multiplayerWins'] / 20 + data['singleplayerWins'] / 5))];
             });
         } else {
+            $rootScope.performance = '??????';
             $rootScope.scores = {'quickestRound' : '/', 'asteroidsKilled' : '/', 'asteroidsKilled1Round': '/', 'singleplayerWins' : '/', 'multiplayerWins' : '/', 'playersKilled' : '/' };
         }
 

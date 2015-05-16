@@ -88,12 +88,16 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angula
      * Opens the sign in modal box.
      */
     $rootScope.showSignIn = function () {
-        ngDialog.closeAll();
-        ngDialog.open({
-            template: 'partials/modals/signIn.html',
-            controller: 'modalCtrl',
-            data: {modelname: 'user', model: {rememberme: true}}
-        });
+        if (this.user === undefined || this.user.id !== undefined) {
+            this.signOut();
+        } else {
+            ngDialog.closeAll();
+            ngDialog.open({
+                template: 'partials/modals/signIn.html',
+                controller: 'modalCtrl',
+                data: {modelname: 'user', model: {rememberme: true}}
+            });
+        }
     };
 
     /**
