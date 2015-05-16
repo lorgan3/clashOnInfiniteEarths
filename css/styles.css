@@ -674,12 +674,41 @@ table tr:nth-child(odd) {
     background-size: 10px;
 }
 
+.rn-carousel-control {
+    color: #fff;
+}
+
 .carousel li {
     background-image: url('http://placehold.it/930x400/ff0000/ffffff');
     border-left: 2px solid #333;
     border-right: 2px solid #333;
     margin-left: -1px !important;
     background-repeat: no-repeat;
+}
+
+.carousel li:nth-child(1) {
+    background-image: url('../img/screenshot8.png');
+}
+.carousel li:nth-child(2) {
+    background-image: url('../img/screenshot2.png');
+}
+.carousel li:nth-child(3) {
+    background-image: url('../img/screenshot3.png');
+}
+.carousel li:nth-child(4) {
+    background-image: url('../img/screenshot4.png');
+}
+.carousel li:nth-child(5) {
+    background-image: url('../img/screenshot5.png');
+}
+.carousel li:nth-child(6) {
+    background-image: url('../img/screenshot6.png');
+}
+.carousel li:nth-child(7) {
+    background-image: url('../img/screenshot7.png');
+}
+.carousel li:nth-child(8) {
+    background-image: url('../img/screenshot1.png');
 }
 
 .no-padding {
