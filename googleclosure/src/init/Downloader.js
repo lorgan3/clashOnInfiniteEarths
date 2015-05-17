@@ -33,6 +33,7 @@ l3.init.Downloader.prototype.init = function() {
 	this.loadSound('crush', 'snd/crush.mp3');
 	this.loadSound('scream', 'snd/scream.mp3');
 	this.loadSound('stun', 'snd/stun.mp3');
+	this.loadSound('music', 'snd/Epic-superhero-music-theme.mp3', true);
 
 	this.loadMesh('wizard', 'models/hero1.json');
 	this.loadMesh('laser', 'models/laser.json');
@@ -69,12 +70,13 @@ l3.init.Downloader.prototype.loadImage = function(name, url) {
 
 /**
  * Download a sound.
- * @param  {string} name The key to get the downloaded sound later.
- * @param  {string} url  path to download from.
+ * @param  {string}   name The key to get the downloaded sound later.
+ * @param  {string}   url  path to download from.
+ * @param  {boolean=} loop Should this song loop?
  */
-l3.init.Downloader.prototype.loadSound = function(name, url) {
+l3.init.Downloader.prototype.loadSound = function(name, url, loop) {
 	//this.models[name] = new Audio(url);
-	this.models[name] = new Howl({ 'urls': [url] });
+	this.models[name] = new Howl({ 'urls': [url], 'loop': loop });
 };
 
 /**

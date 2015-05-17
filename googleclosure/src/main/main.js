@@ -93,6 +93,8 @@ function startGame(isHost, token, maxplayers, peerserver, peerserverport, server
     control = new l3.main.Control(game);
     particleHandler = new l3.helpers.ParticleHandler();
 
+    downloader.get('music').play();
+
     // Start the game once all materials and objects are download.
     downloader.readyCallback = function() {
         // The world everything revolves around.

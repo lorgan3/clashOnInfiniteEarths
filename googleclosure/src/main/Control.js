@@ -34,10 +34,28 @@ l3.main.Control = function(game) {
         });
     }
 
+    // Windows phone
+    if (window.navigator['msPointerEnabled'] === true) {
+        game.addEventListener('MSPointerMove', function(e) {
+            self.pointerX = (e.pageX - window.innerWidth/2)/80;
+            self.pointerY = (e.pageY - window.innerHeight/2)/80;
+
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+    }
+
+    // Other mobile devices without deviceorientation
     game.addEventListener('touchmove', function(e) {
-        self.pointerX = (e.pageX - window.innerWidth/2)/80;
-        self.pointerY = (e.pageY - window.innerHeight/2)/80;
+        self.pointerX = (e.targetTouches[0].pageX - window.innerWidth/2)/80;
+        self.pointerY = (e.targetTouches[0].pageY - window.innerHeight/2)/80;
+
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
     });
+
 
     // Select a new ability on mobile devices.
     hud.panel.addEventListener('touchstart', function(e) {
@@ -127,18 +145,22 @@ l3.main.Control = function(game) {
             e.stopPropagation();
             e.preventDefault();
             return false;
+        } else if (e.keyCode === 49) {
+            hud.select(0);
+            self.clicks[l3.main.Control.Mouse.RIGHT] = true;
+        } else if (e.keyCode === 50) {
+            hud.select(1);
+            self.clicks[l3.main.Control.Mouse.RIGHT] = true;
+        } else if (e.keyCode === 51) {
+            hud.select(2);
+            self.clicks[l3.main.Control.Mouse.RIGHT] = true;
         }
     });
     document.addEventListener('keyup', function(e) {
         if (e.keyCode === 9) {
             classSelect.hide();
-        } else if (e.keyCode === 49) {
-            hud.select(0);
-        } else if (e.keyCode === 50) {
-            hud.select(1);
-        } else if (e.keyCode === 51) {
-            hud.select(2);
         }
+        self.clicks[l3.main.Control.Mouse.RIGHT] = false;
     });
 };
 
