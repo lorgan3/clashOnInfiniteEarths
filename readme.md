@@ -21,10 +21,19 @@ multiple files and forces the developer to write good documentation.
 ![Asteroid hit](https://dl.dropboxusercontent.com/u/61252990/screenshot4.png)
 ![Debug mode](https://dl.dropboxusercontent.com/u/61252990/screenshot1.png)
 
+## Trying it out
+### The game is available at http://lennertclaeys.ikdoeict.be/project2/#/
+### Or can also be installed manually:
+-clone the repo
+-npm install
+-bower install
+-Change the location of the API in app.js line 176
+-Ready to go
+
 ## Used resources
 ### Sounds
-https://www.freesound.org/
-https://www.youtube.com/watch?v=WNVNHjs-skc
+-https://www.freesound.org/
+-https://www.youtube.com/watch?v=WNVNHjs-skc
 
 ### Images / sprites
 http://celestia.h-schmidt.net/earth-vt/unshaded1024.jpg (earth texture)
