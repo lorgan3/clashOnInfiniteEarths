@@ -331,14 +331,16 @@ window['showClassSelect'] = showClassSelect;
 
 function enableDebug() {
     debug = true;
-    gameEnd();
 
-    for (var i = scene.children-1; i>=0; i--) {
-        scene.remove(scene.children[i]);
+    if (scene !== undefined) {
+        gameEnd();
+        for (var i = scene.children-1; i>=0; i--) {
+            scene.remove(scene.children[i]);
+        }
+        for (var i = scene2.children-1; i>=0; i--) {
+            scene2.remove(scene2.children[i]);
+        }
+        downloader.readyCallback();
     }
-    for (var i = scene2.children-1; i>=0; i--) {
-        scene2.remove(scene2.children[i]);
-    }
-    downloader.readyCallback();
 }
 window['debug'] = enableDebug;

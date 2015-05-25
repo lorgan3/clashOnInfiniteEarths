@@ -38,7 +38,7 @@ l3.init.PlayerFactory.Wizard = function(position) {
             }
         }
         animationListener.on(model.animations[2], 0.3, function(e) {
-            var target = collisionHelper.hit(player.worldposition, 1.5, player)[0];
+            var target = collisionHelper.hit(player.punchWorldposition.add(player.worldposition), 0.8, player)[0];
             if (target !== undefined) {
                 if (target instanceof l3.objects.Player || target instanceof l3.objects.Asteroid) {
                     if (networker.isHost === true || networker.token === undefined) {

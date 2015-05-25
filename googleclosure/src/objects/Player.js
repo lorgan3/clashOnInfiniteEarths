@@ -74,6 +74,10 @@ l3.objects.Player = function(model, stateMachine, options) {
     this.pivot2.add(this.pivot);
     this.pivot.add(this.model);
 
+    this.punchHitbox = new THREE.Object3D();
+    this.punchHitbox.position.set(1.3, 0.6, 0);
+    this.pivot.add(this.punchHitbox);
+
     if (debug === true) {
         var hitbox = new THREE.Mesh(new THREE.SphereGeometry(this.size), new THREE.MeshBasicMaterial({ 'color': 0x0000ff, 'wireframe': true }));
         hitbox.position.z = model.position.z;
@@ -83,9 +87,9 @@ l3.objects.Player = function(model, stateMachine, options) {
         hitbox2.position.z = model.position.z;
         this.pivot.add(hitbox2);
 
-        var hitbox3 = new THREE.Mesh(new THREE.SphereGeometry(1.5), new THREE.MeshBasicMaterial({ 'color': 0xff0000, 'wireframe': true }));
+        var hitbox3 = new THREE.Mesh(new THREE.SphereGeometry(0.8), new THREE.MeshBasicMaterial({ 'color': 0xff0000, 'wireframe': true }));
         hitbox3.position.z = model.position.z;
-        this.pivot.add(hitbox3);
+        this.punchHitbox.add(hitbox3);
     }
 
     options = options || {};
@@ -104,6 +108,12 @@ l3.objects.Player = function(model, stateMachine, options) {
      * @type {Object}
      */
     this.worldposition = new THREE.Vector3(0, 0, 0);
+
+    /**
+     * The position of the punch hitbox
+     * @type {Object}
+     */
+    this.punchWorldposition = new THREE.Vector3(0, 0, 0);
 
     /**
      * A particle system for the smoke trail.
@@ -167,6 +177,9 @@ l3.objects.Player.prototype.deserializeState = function(data) {
 l3.objects.Player.prototype.update = function(delta) {
     // Update the worldposition.
     this.worldposition.setFromMatrixPosition(this.model.matrixWorld);
+
+    // Update the punch worldposition.
+    this.punchWorldposition.setFromMatrixPosition(this.punchHitbox.matrixWorld);
 
     // Add new particles.
     this.system.spawn(this.worldposition, this.pivot2.rotation, 0.5);
