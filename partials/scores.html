@@ -44,7 +44,7 @@
                     <th style="width: 22%">Single</th>
                     <th style="width: 22%">Multi</th>
                 </tr>
-                <tr ng-repeat="score in highscores">
+                <tr ng-repeat="score in highscores" ng-class="(score.id === user.id) ? 'selected' : ''">
                     <td>{{ $index+1 }}</td>
                     <td>{{ score.name }}</td>
                     <td>{{ score.singleplayerWins }}</td>

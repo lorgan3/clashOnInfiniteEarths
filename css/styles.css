@@ -423,9 +423,10 @@ dl.half {
 }
 
 dt {
-    background: #FFE685;
+    background-color: rgba(255,229,133, 0.4);
+    border: 1px solid rgb(255,229,133);
     padding: 5px;
-    margin: 0 3px;
+    margin: 10px 3px 0 3px;
     font-weight: bold;
 }
 
@@ -458,7 +459,15 @@ table tr {
     line-height: 25px;
 }
 table tr:nth-child(odd) {
-    background-color: #FFE685;
+    background-color: rgba(255,229,133, 0.4);
+    border: 1px solid rgb(255,229,133);
+}
+table tr td {
+    text-indent: 3px;
+}
+table tr.selected {
+    background-color: rgba(255,128,128, 0.4);
+    border: 1px solid rgb(255,128,128);
 }
 
 .fit {
@@ -543,7 +552,7 @@ table tr:nth-child(odd) {
 /** Specific */
 #pc-controls {
     float: left;
-    min-height: 510px;
+    min-height: 536px;
 }
 
 /*****************************
