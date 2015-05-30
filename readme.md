@@ -27,6 +27,7 @@ multiple files and forces the developer to write good documentation.
 -clone the repo
 -npm install
 -bower install
+-composer install in the api folder  
 -Change the location of the API in app.js line 176
 -Ready to go
 
