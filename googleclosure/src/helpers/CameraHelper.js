@@ -135,7 +135,7 @@ l3.helpers.CameraHelper.prototype.shake = function(time, intensity) {
     this.intensity = intensity || 100;
 
     //Also vibrate using the html5 vibration api.
-    if (window.navigator['vibrate'] !== undefined) {
-        window.navigator['vibrate'](this.intensity * 1.5);
+    if ('vibrate' in window.navigator) {
+        window.navigator['vibrate'](100);
     }
 };
