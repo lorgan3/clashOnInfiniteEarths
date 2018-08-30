@@ -36,6 +36,7 @@ multiple files and forces the developer to write good documentation.
 - npm install in `googleclosure/`
 - bower install in `/`
 - composer install in `api/`
+- Run `gulp compile` in `googleclosure/` to create the bundled javascript file for the game itself.
 - Change the location of the API in app.js line 176
 - Ready to go
 
