@@ -15,8 +15,8 @@ gulp.task('compile', function() {
       compilerFlags: {
         language_in: 'ECMASCRIPT5',
         closure_entry_point: 'l3.main',
-        compilation_level: 'ADVANCED_OPTIMIZATIONS',
-        //formatting: 'PRETTY_PRINT',
+        compilation_level: 'ADVANCED_OPTIMIZATIONS', // 'SIMPLE'
+        // formatting: 'PRETTY_PRINT',
         define: [
           //"goog.DEBUG=false"
         ],

@@ -173,7 +173,7 @@ var app = angular.module('l3game', ['ngRoute', 'ngResource', 'ngDialog', 'angula
 })
 
 .constant('apiKey', 'JaTQVBvA-FdfP6542-jzeTXp4R-HtSQHCHm-ckJUY9HD')
-.constant('apiPath', 'http://' + window.location.hostname + ':8080/project2/api')
+.constant('apiPath', 'http://' + window.location.hostname + '/WMD_1415_project02/api')
 
 .config(function($routeProvider) {
     $routeProvider.when('/', {

@@ -1,9 +1,14 @@
+**2018 Edit**: This is an old project I made for school that I decided to put up on github.
+I updated peerjs to work without api key, everything else is like it was when I turned it in. (bugs included)
+
+***
+
 # Web & Mobile Development 14-15 Project 2
 
 ## Initial idea
 ~~1 to 4 players can play together in an area where they have to survive as long
 as possible while beating enemies. Extras like pickups or dynamic terrain are
-possible.~~  
+possible.~~
 During multiplayer all players fly around a planet with a few asteroids floating around. The goal is to kill all enemy heros and remain the last man standing.
 During singleplayer there are a lot of asteroids floating around. The goal of the game is to break all big asteroids without getting hit.
 
@@ -22,38 +27,39 @@ multiple files and forces the developer to write good documentation.
 ![Debug mode](https://dl.dropboxusercontent.com/u/61252990/screenshot1.png)
 
 ## Trying it out
-### The game is available at http://lennertclaeys.ikdoeict.be/project2/#/
+### The game is available at ~~ http://lennertclaeys.ikdoeict.be/project2/#/ ~~ (alternative link, might be outdated: http://l3.ajf.me/web/project2/index.html#/ )
+
 ### Or can also be installed manually:
 -clone the repo
--npm install
--bower install
--composer install in the api folder  
+-npm install in `googleclosure/`
+-bower install in `/`
+-composer install in `api/`
 -Change the location of the API in app.js line 176
 -Ready to go
 
 ## Used resources
 ### Sounds
--https://www.freesound.org/  
+-https://www.freesound.org/
 -https://www.youtube.com/watch?v=WNVNHjs-skc
 
 ### Images / sprites
-http://celestia.h-schmidt.net/earth-vt/unshaded1024.jpg (earth texture)  
-http://www.wired.com/images_blogs/wiredscience/2013/01/vesta.jpg (asteroid1)  
+http://celestia.h-schmidt.net/earth-vt/unshaded1024.jpg (earth texture)
+http://www.wired.com/images_blogs/wiredscience/2013/01/vesta.jpg (asteroid1)
 http://wise.ssl.berkeley.edu/gallery_images/V2-TwoAsteroids-image.jpg (asteroid2)
 
 ### 3D models
 Custom made with blender
 
 ### JS libraries
-Angular  
-Angular-route  
-Angular-resource  
-Angular-touch  
-Angular-carousel  
-NgDialog  
-Peerjs  
-Threejs  
-Stats.js (threejs)  
+Angular
+Angular-route
+Angular-resource
+Angular-touch
+Angular-carousel
+NgDialog
+Peerjs
+Threejs
+Stats.js (threejs)
 Howler
 
 ---

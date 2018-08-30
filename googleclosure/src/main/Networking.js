@@ -23,7 +23,9 @@ l3.main.Networking = function(isHost, token, maxplayers, peerserver, peerserverp
     if (peerserver !== undefined && String(peerserver).trim() !== '') {
         var options = {'debug': 0, 'host': peerserver, 'port': peerserverport, 'path': '/'}
     } else {
-        var options = {'key': 'lsu2wx71j874lsor', 'debug': 0}
+        // Edit 2018: A key is no longer required for public peerjs servers.
+        // var options = {'key': 'lsu2wx71j874lsor', 'debug': 0}
+        var options = { 'debug': 0 }
     }
 
     if (isHost === true) {

@@ -1,0 +1,16 @@
+{
+  "name": "clash_on_infinite_earths",
+  "version": "1.0.0",
+  "description": "Clash on infinite earths game",
+  "main": "Gulpfile.js",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-closure-compiler": "^0.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lennert Claeys",
+  "license": "ISC"
+}
